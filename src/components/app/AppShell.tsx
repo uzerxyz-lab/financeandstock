@@ -11,7 +11,7 @@ import { AccountSearch, Field, TitleInput } from "./inputs";
 import { changePassword, checkPw, getData, loadData, matchesRecovery, redo, setupAuth, takeSnapshot, undo, useData, useLoaded } from "@/lib/db";
 import { norm } from "@/lib/format";
 import { Logo } from "@/components/app/Logo";
-import { mussaMark } from "@/lib/logo-images";
+import { mussaMark, whiteLogo } from "@/lib/logo-images";
 import loginBg from "@/assets/login-industrial.webp.asset.json";
 import nexumLogo from "@/assets/nexum-systems.webp.asset.json";
 import { backupToCloud, scheduleAutoBackup } from "@/lib/cloud";
@@ -231,29 +231,35 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="relative grid min-h-screen bg-[#5f6e88] lg:grid-cols-[58%_42%]">
       <div
-        className="relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex"
-        style={{ clipPath: "polygon(0 0, 100% 0, 86% 50%, 100% 100%, 0 100%)" }}
+        className="relative z-10 hidden flex-col justify-between overflow-hidden py-12 pl-12 pr-[22%] text-white lg:flex"
+        style={{ clipPath: "polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%)", filter: "drop-shadow(12px 0 24px rgba(0,0,0,.35))" }}
       >
         <img src={loginBg.url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative text-xs uppercase tracking-widest text-white/70">Mussa Enterprises · Cash Book</div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/90 via-[#0f172a]/75 to-[#0a0f1d]/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(5,8,18,.7)_100%)]" />
+        <div className="relative text-xs uppercase tracking-widest text-white/70">Mussa Enterprises · Finance Control</div>
         <div className="relative">
-          <h2 className="text-4xl font-semibold leading-tight xl:text-5xl">Every rupee in,<br />every rupee out<span className="text-white/70">… &gt;</span></h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
+          <h2 className="text-4xl font-semibold leading-tight xl:text-5xl">
+            Control your business<br />and finance your way
+            <span className="ml-1 inline-flex items-baseline text-[0.78em] text-white/75">
+              …<span className="login-chev ml-1">›</span><span className="login-chev login-chev-2">›</span>
+            </span>
+          </h2>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-white/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
         </div>
         <div className="relative flex items-center gap-2 text-xs text-white/70">
           <span>Developed by</span>
           <img src={nexumLogo.url} alt="nexum systems" className="h-5 w-auto object-contain" />
         </div>
       </div>
-       <div className="relative flex items-center justify-center bg-slate-500/40 p-6 dark:bg-slate-800/60">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border border-white/40 bg-white/55 p-8 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55">
-          <Logo className="mx-auto mb-2 h-auto w-64" />
-          <div className="border-t pt-4">
-            <h1 className="text-xl font-semibold">{firstRun ? "Set up your Cash Book" : forgot ? "Reset password" : "Sign in"}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{firstRun ? "Create your username, PIN and recovery detail." : forgot ? "Confirm your username and registered email or phone." : needUser ? "Enter your username and PIN." : "Enter your PIN to unlock."}</p>
+      <div className="relative flex items-center justify-center p-6">
+        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#0a0f1d]/65 p-8 text-white shadow-2xl backdrop-blur-xl">
+          <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
+          <div className="border-t border-white/10 pt-4">
+            <h1 className="text-xl font-semibold">{firstRun ? "Set Up Your Cash Control" : forgot ? "Reset password" : "Sign in"}</h1>
+            <p className="mt-1 text-sm text-white/60">{firstRun ? "Configure master PIN and business access to secure your ledger." : forgot ? "Confirm your username and registered email or phone." : needUser ? "Enter your username and PIN." : "Enter your PIN to unlock."}</p>
           </div>
           {(firstRun || forgot) && (
             <Field label="Company / Business Name">
