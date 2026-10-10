@@ -266,3 +266,11 @@
   outline-offset: 2px;
   border-radius: var(--radius-md, 0.375rem);
 }
+
+@keyframes login-chev-pulse {
+  0%, 100% { opacity: 0.35; }
+  40% { opacity: 1; }
+}
+.login-chev { display: inline-block; animation: login-chev-pulse 2.5s ease-in-out infinite; }
+.login-chev-2 { animation-delay: 0.35s; }
+@media (prefers-reduced-motion: reduce) { .login-chev { animation: none; } }
