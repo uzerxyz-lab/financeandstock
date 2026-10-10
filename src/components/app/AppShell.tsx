@@ -239,10 +239,10 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,8,18,.55)_100%)]" />
       </div>
       {/* Mobile corner accents */}
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-4xl font-light leading-none text-white/50 lg:hidden">
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-[5rem] font-light leading-none text-white/50 lg:hidden">
         <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span><span className="login-chev login-chev-3">›</span>
       </div>
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-3xl font-light leading-none text-white/50 lg:hidden">
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-[2.5rem] font-light leading-none text-white/50 lg:hidden">
         <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span>
       </div>
       <div className="pointer-events-none absolute bottom-4 right-5 z-10 flex items-center gap-1.5 text-[10px] text-white/70 lg:hidden">
