@@ -268,8 +268,8 @@
 }
 
 @keyframes login-chev-pulse {
-  0%, 100% { opacity: 0.35; }
-  40% { opacity: 1; }
+  0%, 100% { opacity: 0.25; }
+  40% { opacity: 0.7; }
 }
 .login-chev { display: inline-block; animation: login-chev-pulse 2.5s ease-in-out infinite; }
 .login-chev-2 { animation-delay: 0.35s; }
