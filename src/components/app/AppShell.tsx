@@ -261,7 +261,7 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
         </div>
       </div>
       <div className="relative flex items-center justify-center p-6">
-        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#0a0f1d]/40 p-8 text-white shadow-2xl backdrop-blur-md lg:bg-[#0a0f1d]/65 lg:backdrop-blur-xl">
+        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/15 bg-[#0a0f1d]/40 p-8 text-white shadow-2xl backdrop-blur-md lg:border-white/10 lg:bg-[#0a0f1d]/65 lg:backdrop-blur-xl">
           <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
           <div className="border-t border-white/10 pt-4">
             <h1 className="text-xl font-semibold">{firstRun ? "Set Up Your Cash Control" : forgot ? "Reset password" : "Sign in"}</h1>
