@@ -232,6 +232,12 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
 
   return (
     <div className="relative grid min-h-screen bg-[#5f6e88] lg:grid-cols-[58%_42%]">
+      {/* Mobile backdrop: same industrial photo + dark overlay behind the glass card */}
+      <div aria-hidden="true" className="absolute inset-0 lg:hidden">
+        <img src={loginBg.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/90 via-[#0f172a]/78 to-[#0a0f1d]/88" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(5,8,18,.75)_100%)]" />
+      </div>
       <div
         className="relative z-10 hidden flex-col justify-between overflow-hidden py-12 pl-12 pr-[22%] text-white lg:flex"
         style={{ clipPath: "polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%)", filter: "drop-shadow(12px 0 24px rgba(0,0,0,.35))" }}
