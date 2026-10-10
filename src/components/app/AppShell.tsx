@@ -238,6 +238,17 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/70 via-[#0f172a]/55 to-[#0a0f1d]/70" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,8,18,.55)_100%)]" />
       </div>
+      {/* Mobile corner accents */}
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-3xl font-light leading-none text-white/75 lg:hidden">
+        <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span><span className="login-chev login-chev-3">›</span>
+      </div>
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-2xl font-light leading-none text-white/75 lg:hidden">
+        <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span>
+      </div>
+      <div className="pointer-events-none absolute bottom-4 right-5 z-10 flex items-center gap-1.5 text-[10px] text-white/70 lg:hidden">
+        <span>Developed by</span>
+        <img src={nexumLogo.url} alt="nexum systems" className="h-4 w-auto object-contain" />
+      </div>
       <div
         className="relative z-10 hidden flex-col justify-between overflow-hidden py-12 pl-12 pr-[22%] text-white lg:flex"
         style={{ clipPath: "polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%)", filter: "drop-shadow(12px 0 24px rgba(0,0,0,.35))" }}
