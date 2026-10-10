@@ -11,7 +11,9 @@ import { AccountSearch, Field, TitleInput } from "./inputs";
 import { changePassword, checkPw, getData, loadData, matchesRecovery, redo, setupAuth, takeSnapshot, undo, useData, useLoaded } from "@/lib/db";
 import { norm } from "@/lib/format";
 import { Logo } from "@/components/app/Logo";
-import mark from "@/assets/mussa-m.png.asset.json";
+import { mussaMark } from "@/lib/logo-images";
+import loginBg from "@/assets/login-industrial.webp.asset.json";
+import nexumLogo from "@/assets/nexum-systems.webp.asset.json";
 import { backupToCloud, scheduleAutoBackup } from "@/lib/cloud";
 import { checkForUpdate } from "@/lib/update";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,7 +93,7 @@ export function AppShell() {
     localStorage.setItem("cashbook-theme", dark ? "dark" : "light");
   }, [dark]);
 
-  if (!loaded) return <div className="flex min-h-screen items-center justify-center bg-background"><img src={mark.url} alt="Mussa Enterprises" className="h-14 w-14 object-contain" /></div>;
+  if (!loaded) return <div className="flex min-h-screen items-center justify-center bg-background"><img src={mussaMark} alt="Mussa Enterprises" className="h-14 w-14 object-contain" /></div>;
   if (!d.auth || !authed) return <Login firstRun={!d.auth} requireUsername={localStorage.getItem(LOGGED_OUT) === "1"} onDone={() => { sessionStorage.setItem(SESSION, "1"); localStorage.removeItem(LOGGED_OUT); setAuthed(true); }} />;
   return <Shell dark={dark ?? false} onToggleTheme={() => setDark((v) => !v)} onLogout={(full?: boolean) => { sessionStorage.removeItem(SESSION); if (full) localStorage.setItem(LOGGED_OUT, "1"); setAuthed(false); }} />;
 }
@@ -230,16 +232,24 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden flex-col justify-between bg-sidebar p-12 text-sidebar-foreground lg:flex">
-        <div className="text-xs uppercase tracking-widest text-sidebar-primary">Mussa Enterprises · Cash Book</div>
-        <div>
-          <h2 className="text-4xl font-semibold leading-tight text-sidebar-accent-foreground">Every rupee in,<br />every rupee out.</h2>
-          <p className="mt-4 max-w-sm text-sm">Sales, purchases, payments, salaries and expenses — recorded, searchable and safe on this computer.</p>
+      <div
+        className="relative hidden flex-col justify-between overflow-hidden p-12 text-white lg:flex"
+        style={{ clipPath: "polygon(0 0, 100% 0, 86% 50%, 100% 100%, 0 100%)" }}
+      >
+        <img src={loginBg.url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative text-xs uppercase tracking-widest text-white/70">Mussa Enterprises · Cash Book</div>
+        <div className="relative">
+          <h2 className="text-4xl font-semibold leading-tight xl:text-5xl">Every rupee in,<br />every rupee out<span className="text-white/70">… &gt;</span></h2>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
         </div>
-        <div className="text-xs">Works fully offline</div>
+        <div className="relative flex items-center gap-2 text-xs text-white/70">
+          <span>Developed by</span>
+          <img src={nexumLogo.url} alt="nexum systems" className="h-5 w-auto object-contain" />
+        </div>
       </div>
-       <div className="relative flex items-center justify-center bg-background p-6">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border bg-card p-8 shadow-sm">
+       <div className="relative flex items-center justify-center bg-slate-500/40 p-6 dark:bg-slate-800/60">
+        <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border border-white/40 bg-white/55 p-8 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/55">
           <Logo className="mx-auto mb-2 h-auto w-64" />
           <div className="border-t pt-4">
             <h1 className="text-xl font-semibold">{firstRun ? "Set up your Cash Book" : forgot ? "Reset password" : "Sign in"}</h1>
