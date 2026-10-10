@@ -235,8 +235,8 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
       {/* Mobile backdrop: same industrial photo + dark overlay behind the glass card */}
       <div aria-hidden="true" className="absolute inset-0 lg:hidden">
         <img src={loginBg.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/90 via-[#0f172a]/78 to-[#0a0f1d]/88" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(5,8,18,.75)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/70 via-[#0f172a]/55 to-[#0a0f1d]/70" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,8,18,.55)_100%)]" />
       </div>
       <div
         className="relative z-10 hidden flex-col justify-between overflow-hidden py-12 pl-12 pr-[22%] text-white lg:flex"
@@ -261,7 +261,7 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
         </div>
       </div>
       <div className="relative flex items-center justify-center p-6">
-        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#0a0f1d]/65 p-8 text-white shadow-2xl backdrop-blur-xl">
+        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/15 bg-[#0a0f1d]/40 p-8 text-white shadow-2xl backdrop-blur-md lg:border-white/10 lg:bg-[#0a0f1d]/65 lg:backdrop-blur-xl">
           <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
           <div className="border-t border-white/10 pt-4">
             <h1 className="text-xl font-semibold">{firstRun ? "Set Up Your Cash Control" : forgot ? "Reset password" : "Sign in"}</h1>
