@@ -11,7 +11,9 @@ import { AccountSearch, Field, TitleInput } from "./inputs";
 import { changePassword, checkPw, getData, loadData, matchesRecovery, redo, setupAuth, takeSnapshot, undo, useData, useLoaded } from "@/lib/db";
 import { norm } from "@/lib/format";
 import { Logo } from "@/components/app/Logo";
-import mark from "@/assets/mussa-m.png.asset.json";
+import { mussaMark } from "@/lib/logo-images";
+import loginBg from "@/assets/login-industrial.webp.asset.json";
+import nexumLogo from "@/assets/nexum-systems.webp.asset.json";
 import { backupToCloud, scheduleAutoBackup } from "@/lib/cloud";
 import { checkForUpdate } from "@/lib/update";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,7 +93,7 @@ export function AppShell() {
     localStorage.setItem("cashbook-theme", dark ? "dark" : "light");
   }, [dark]);
 
-  if (!loaded) return <div className="flex min-h-screen items-center justify-center bg-background"><img src={mark.url} alt="Mussa Enterprises" className="h-14 w-14 object-contain" /></div>;
+  if (!loaded) return <div className="flex min-h-screen items-center justify-center bg-background"><img src={mussaMark} alt="Mussa Enterprises" className="h-14 w-14 object-contain" /></div>;
   if (!d.auth || !authed) return <Login firstRun={!d.auth} requireUsername={localStorage.getItem(LOGGED_OUT) === "1"} onDone={() => { sessionStorage.setItem(SESSION, "1"); localStorage.removeItem(LOGGED_OUT); setAuthed(true); }} />;
   return <Shell dark={dark ?? false} onToggleTheme={() => setDark((v) => !v)} onLogout={(full?: boolean) => { sessionStorage.removeItem(SESSION); if (full) localStorage.setItem(LOGGED_OUT, "1"); setAuthed(false); }} />;
 }
