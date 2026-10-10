@@ -1,12 +1,16 @@
-# Classic Calculator
+## Project Developer > [ UZER XYZ ]
 
-Create classic calculator app
+Email: uzer.xyz@gmail.com
+
+Contact: +92-333-3334486
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://nexum-tech.lovable.app
+
 ## Build with Lovable
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6e4622b9-e5b0-4853-8747-df3ae6788140).
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/ecd1c1d6-a2ef-42bc-b2f7-c724b69a74b8).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.

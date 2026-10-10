@@ -1,0 +1,10 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { PageHeader } from "@/components/app/inputs";
+import { accountBalance, liveAccounts, useData } from "@/lib/db";
+import { fmtPKR } from "@/lib/format";
+export const Route = createFileRoute("/workers")({
+  head: () => ({ meta: [{ title: "Worker Accounts — Mussa Enterprises" }, { name: "description", content: "Worker accounts, wages, salary and advances." }, { property: "og:title", content: "Worker Accounts — Mussa Enterprises" }, { property: "og:description", content: "Worker accounts, wages, salary and advances." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  component: Workers,
+});
+function Workers() { const d = useData(); const workers = liveAccounts(d).filter((a) => a.type === "worker"); return <div><PageHeader title="Worker Accounts" subtitle={`${workers.length} workers`} /><div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{workers.map((worker) => <Link key={worker.id} to="/ledger/$id" params={{ id: worker.id }} className="rounded-lg border-2 bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><div className="flex justify-between gap-3"><div><div className="font-semibold">{worker.name}</div><div className="num text-xs text-muted-foreground">{worker.code}</div></div><div className="num text-sm font-medium">{fmtPKR(Math.abs(accountBalance(d, worker.id)))}</div></div><div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground"><span>Fixed wages</span><span className="num text-right">{worker.fixedWages ? fmtPKR(worker.fixedWages) : "Not set"}</span><span>Contact</span><span className="text-right">{worker.phone || "—"}</span></div></Link>)}</div>{workers.length === 0 && <div className="rounded-lg border p-10 text-center text-muted-foreground">No worker accounts yet.</div>}</div>; }

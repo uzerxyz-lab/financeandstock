@@ -10,33 +10,232 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CashbookRouteImport } from './routes/cashbook'
+import { Route as EntriesRouteImport } from './routes/entries'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as LoansRouteImport } from './routes/loans'
+import { Route as PurchasesRouteImport } from './routes/purchases'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as SalesRouteImport } from './routes/sales'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as StockRouteImport } from './routes/stock'
+import { Route as VouchersRouteImport } from './routes/vouchers'
+import { Route as WorkersRouteImport } from './routes/workers'
+import { Route as LedgerIdRouteImport } from './routes/ledger.$id'
+import { Route as VoucherIdRouteImport } from './routes/voucher.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CashbookRoute = CashbookRouteImport.update({
+  id: '/cashbook',
+  path: '/cashbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntriesRoute = EntriesRouteImport.update({
+  id: '/entries',
+  path: '/entries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoansRoute = LoansRouteImport.update({
+  id: '/loans',
+  path: '/loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PurchasesRoute = PurchasesRouteImport.update({
+  id: '/purchases',
+  path: '/purchases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalesRoute = SalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StockRoute = StockRouteImport.update({
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VouchersRoute = VouchersRouteImport.update({
+  id: '/vouchers',
+  path: '/vouchers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkersRoute = WorkersRouteImport.update({
+  id: '/workers',
+  path: '/workers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LedgerIdRoute = LedgerIdRouteImport.update({
+  id: '/ledger/$id',
+  path: '/ledger/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoucherIdRoute = VoucherIdRouteImport.update({
+  id: '/voucher/$id',
+  path: '/voucher/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/admin': typeof AdminRoute
+  '/cashbook': typeof CashbookRoute
+  '/entries': typeof EntriesRoute
+  '/expenses': typeof ExpensesRoute
+  '/loans': typeof LoansRoute
+  '/purchases': typeof PurchasesRoute
+  '/reports': typeof ReportsRoute
+  '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
+  '/stock': typeof StockRoute
+  '/vouchers': typeof VouchersRoute
+  '/workers': typeof WorkersRoute
+  '/ledger/$id': typeof LedgerIdRoute
+  '/voucher/$id': typeof VoucherIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/admin': typeof AdminRoute
+  '/cashbook': typeof CashbookRoute
+  '/entries': typeof EntriesRoute
+  '/expenses': typeof ExpensesRoute
+  '/loans': typeof LoansRoute
+  '/purchases': typeof PurchasesRoute
+  '/reports': typeof ReportsRoute
+  '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
+  '/stock': typeof StockRoute
+  '/vouchers': typeof VouchersRoute
+  '/workers': typeof WorkersRoute
+  '/ledger/$id': typeof LedgerIdRoute
+  '/voucher/$id': typeof VoucherIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
+  '/admin': typeof AdminRoute
+  '/cashbook': typeof CashbookRoute
+  '/entries': typeof EntriesRoute
+  '/expenses': typeof ExpensesRoute
+  '/loans': typeof LoansRoute
+  '/purchases': typeof PurchasesRoute
+  '/reports': typeof ReportsRoute
+  '/sales': typeof SalesRoute
+  '/settings': typeof SettingsRoute
+  '/stock': typeof StockRoute
+  '/vouchers': typeof VouchersRoute
+  '/workers': typeof WorkersRoute
+  '/ledger/$id': typeof LedgerIdRoute
+  '/voucher/$id': typeof VoucherIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/accounts'
+    | '/admin'
+    | '/cashbook'
+    | '/entries'
+    | '/expenses'
+    | '/loans'
+    | '/purchases'
+    | '/reports'
+    | '/sales'
+    | '/settings'
+    | '/stock'
+    | '/vouchers'
+    | '/workers'
+    | '/ledger/$id'
+    | '/voucher/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/accounts'
+    | '/admin'
+    | '/cashbook'
+    | '/entries'
+    | '/expenses'
+    | '/loans'
+    | '/purchases'
+    | '/reports'
+    | '/sales'
+    | '/settings'
+    | '/stock'
+    | '/vouchers'
+    | '/workers'
+    | '/ledger/$id'
+    | '/voucher/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/accounts'
+    | '/admin'
+    | '/cashbook'
+    | '/entries'
+    | '/expenses'
+    | '/loans'
+    | '/purchases'
+    | '/reports'
+    | '/sales'
+    | '/settings'
+    | '/stock'
+    | '/vouchers'
+    | '/workers'
+    | '/ledger/$id'
+    | '/voucher/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountsRoute: typeof AccountsRoute
+  AdminRoute: typeof AdminRoute
+  CashbookRoute: typeof CashbookRoute
+  EntriesRoute: typeof EntriesRoute
+  ExpensesRoute: typeof ExpensesRoute
+  LoansRoute: typeof LoansRoute
+  PurchasesRoute: typeof PurchasesRoute
+  ReportsRoute: typeof ReportsRoute
+  SalesRoute: typeof SalesRoute
+  SettingsRoute: typeof SettingsRoute
+  StockRoute: typeof StockRoute
+  VouchersRoute: typeof VouchersRoute
+  WorkersRoute: typeof WorkersRoute
+  LedgerIdRoute: typeof LedgerIdRoute
+  VoucherIdRoute: typeof VoucherIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +247,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cashbook': {
+      id: '/cashbook'
+      path: '/cashbook'
+      fullPath: '/cashbook'
+      preLoaderRoute: typeof CashbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entries': {
+      id: '/entries'
+      path: '/entries'
+      fullPath: '/entries'
+      preLoaderRoute: typeof EntriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loans': {
+      id: '/loans'
+      path: '/loans'
+      fullPath: '/loans'
+      preLoaderRoute: typeof LoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/purchases': {
+      id: '/purchases'
+      path: '/purchases'
+      fullPath: '/purchases'
+      preLoaderRoute: typeof PurchasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sales': {
+      id: '/sales'
+      path: '/sales'
+      fullPath: '/sales'
+      preLoaderRoute: typeof SalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stock': {
+      id: '/stock'
+      path: '/stock'
+      fullPath: '/stock'
+      preLoaderRoute: typeof StockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vouchers': {
+      id: '/vouchers'
+      path: '/vouchers'
+      fullPath: '/vouchers'
+      preLoaderRoute: typeof VouchersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workers': {
+      id: '/workers'
+      path: '/workers'
+      fullPath: '/workers'
+      preLoaderRoute: typeof WorkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ledger/$id': {
+      id: '/ledger/$id'
+      path: '/ledger/$id'
+      fullPath: '/ledger/$id'
+      preLoaderRoute: typeof LedgerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voucher/$id': {
+      id: '/voucher/$id'
+      path: '/voucher/$id'
+      fullPath: '/voucher/$id'
+      preLoaderRoute: typeof VoucherIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountsRoute: AccountsRoute,
+  AdminRoute: AdminRoute,
+  CashbookRoute: CashbookRoute,
+  EntriesRoute: EntriesRoute,
+  ExpensesRoute: ExpensesRoute,
+  LoansRoute: LoansRoute,
+  PurchasesRoute: PurchasesRoute,
+  ReportsRoute: ReportsRoute,
+  SalesRoute: SalesRoute,
+  SettingsRoute: SettingsRoute,
+  StockRoute: StockRoute,
+  VouchersRoute: VouchersRoute,
+  WorkersRoute: WorkersRoute,
+  LedgerIdRoute: LedgerIdRoute,
+  VoucherIdRoute: VoucherIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

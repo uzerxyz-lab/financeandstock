@@ -1,0 +1,23 @@
+# Roadmap
+- [x] Correct Purchase Type label, PIN-to-edit transition, previous voucher balance and combined bank/number line
+- [x] Remove automatic update alerts and embed theme-aware app/voucher logos without separate network requests
+- [x] Preserve logo proportions across header/previews/prints and reduce header logo size; trade Remarks, automatic Particulars and Sale Type on vouchers
+- [x] Bento dashboard: colour palette, reorderable tiles, Admin quick button, hamburger menu, app lock, forgot password
+- [x] Redesign dashboard with professional summary tiles and visible report snapshots
+- [x] All pages (dashboard, entries, accounts, ledger, cashbook, expenses, reports, admin, settings, voucher)
+- [x] Branding: M mark icons, full logo on header, login, prints
+- [x] Sale/purchase material, weight, rate, credit/advance + Stock page with billet production
+- [x] Spec details: short IDs, search, shortcuts, drafts, 30-min restore points, cash tally, recycle bin
+- [x] English UI, installable app manifest
+- [x] Account-specific forms and searches; searchable expense categories; tags removed
+- [x] Dedicated sales, purchases, workers and isolated personal-loans pages
+- [x] PIN setup and local email/phone recovery; persistent adaptive theme
+- [x] Updated dashboard/header, cash privacy, drag-only tile ordering and print sizing
+- [x] Restrict expense picker to five defaults plus newly added categories without erasing historical records
+- [x] Reference-style account directory and ledger history with PIN-gated icon actions, clean print statement
+- [x] Keep chosen theme through lock and login
+- [ ] Full offline caching of the app itself (service worker) — to add next
+- [ ] Optional cloud backup — waiting for user go-ahead
+- [x] Online transfers in Cash in Hand; Vouchers card + page; logo-first print header; worker salary/advance ledger; draft restore fix; Backup & Sync icon; update check; in-app "+ New" popups
+- [x] Voucher share as image with thank-you footer; opening balance type rule; required Sale Type; field error highlight + vibration
+- [x] Voucher Previous Balance moved below the Bank line
