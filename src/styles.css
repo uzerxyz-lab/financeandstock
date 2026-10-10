@@ -273,4 +273,6 @@
 }
 .login-chev { display: inline-block; animation: login-chev-pulse 2.5s ease-in-out infinite; }
 .login-chev-2 { animation-delay: 0.35s; }
+.login-chev-3 { animation-delay: 0.7s; }
+.login-chev-italic { transform: skewX(-14deg); }
 @media (prefers-reduced-motion: reduce) { .login-chev { animation: none; } }
