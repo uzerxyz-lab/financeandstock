@@ -11,7 +11,7 @@ import { AccountSearch, Field, TitleInput } from "./inputs";
 import { changePassword, checkPw, getData, loadData, matchesRecovery, redo, setupAuth, takeSnapshot, undo, useData, useLoaded } from "@/lib/db";
 import { norm } from "@/lib/format";
 import { Logo } from "@/components/app/Logo";
-import { mussaMark } from "@/lib/logo-images";
+import { mussaMark, whiteLogo } from "@/lib/logo-images";
 import loginBg from "@/assets/login-industrial.webp.asset.json";
 import nexumLogo from "@/assets/nexum-systems.webp.asset.json";
 import { backupToCloud, scheduleAutoBackup } from "@/lib/cloud";
