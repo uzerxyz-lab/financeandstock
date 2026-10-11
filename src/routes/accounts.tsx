@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AccountForm } from "@/components/app/AccountForm";
 import { PageHeader } from "@/components/app/inputs";
-import { accountBalance, accountTypeLabel, liveAccounts, useData, ACCOUNT_TYPES } from "@/lib/db";
+import { accountBalance, accountTypeLabel, balanceClass, liveAccounts, useData, ACCOUNT_TYPES } from "@/lib/db";
 import { fmtPKR, norm } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +62,7 @@ function AccountsPage() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-              <div className="text-right"><div className="text-[10px] uppercase text-muted-foreground">Balance</div><div className={cn("num text-sm font-semibold sm:text-lg", b >= 0 ? "text-success" : "text-destructive")}>{b < 0 ? "−" : ""}{fmtPKR(Math.abs(b))}</div></div>
+              <div className="text-right"><div className="text-[10px] uppercase text-muted-foreground">{balanceClass(a, b)}</div><div className={cn("num text-sm font-semibold sm:text-lg", b >= 0 ? "text-success" : "text-destructive")}>{b < 0 ? "−" : ""}{fmtPKR(Math.abs(b))}</div></div>
               <ChevronRight className="hidden h-4 w-4 text-muted-foreground group-hover:text-primary sm:block" />
             </div>
           </Link>

@@ -4,7 +4,7 @@ import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, PageHeader, PrintHeader } from "@/components/app/inputs";
-import { accountBalance, liveAccounts, liveEntries, useData, ENTRY_TYPES, ACCOUNT_TYPES, type EntryType } from "@/lib/db";
+import { accountBalance, balanceClass, fundList, liveAccounts, liveEntries, useData, ENTRY_TYPES, ACCOUNT_TYPES, type EntryType } from "@/lib/db";
 import { fmtDate, fmtPKR } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -39,8 +39,12 @@ function Reports() {
     salary: entries.filter((e) => e.accountId === a.id && e.type === "salary").reduce((s, e) => s + e.amount, 0),
     advance: entries.filter((e) => e.accountId === a.id && e.type === "advance").reduce((s, e) => s + e.amount, 0),
   }));
-  const rec = accs.filter((x) => x.b > 0 && x.a.type !== "worker").sort((x, y) => y.b - x.b);
-  const pay = accs.filter((x) => x.b < 0).sort((x, y) => x.b - y.b);
+  const cls = (c: string) => accs.filter((x) => x.a.type !== "worker" && balanceClass(x.a, x.b) === c).sort((x, y) => Math.abs(y.b) - Math.abs(x.b));
+  const rec = cls("Receivable");
+  const pay = accs.filter((x) => !x.a.equity && balanceClass(x.a, x.b) === "Payable").sort((x, y) => x.b - y.b);
+  const supAdv = cls("Supplier Advance");
+  const custAdv = cls("Customer Advance");
+  const funds = fundList(d);
 
   const Table = ({ title, rows, tone }: { title: string; rows: typeof rec; tone: string }) => (
     <div className="rounded-lg border bg-card">
@@ -79,6 +83,14 @@ function Reports() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Table title="Receivables (Dr)" rows={rec} tone="text-success" />
         <Table title="Payables (Cr)" rows={pay} tone="text-destructive" />
+        <Table title="Supplier Advances (Dr)" rows={supAdv} tone="text-success" />
+        <Table title="Customer Advances (Cr)" rows={custAdv} tone="text-destructive" />
+      </div>
+      <div className="rounded-lg border bg-card">
+        <h3 className="border-b px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Cash & Bank Balances (cleared)</h3>
+        <table className="w-full text-sm"><tbody>
+          {funds.map((f) => <tr key={f.id} className="border-t first:border-t-0"><td className="px-4 py-2">{f.name}</td><td className="num px-4 py-2 text-right">{fmtPKR(f.closing, false)}{f.pending ? <span className="ml-2 text-xs text-warning">(pending {fmtPKR(f.pending, false)})</span> : null}</td></tr>)}
+        </tbody></table>
       </div>
       <div className="rounded-lg border bg-card">
         <h3 className="border-b px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Workers — Salary & Advance</h3>

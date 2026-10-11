@@ -9,7 +9,7 @@ import { EntryForm } from "@/components/app/EntryForm";
 import { PinActionDialog } from "@/components/app/PinActionDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TypeBadge } from "@/components/app/EntriesTable";
-import { accountTypeLabel, deleteItems, liveEntries, signedForAccount, useData, METHODS, ENTRY_TYPES, type Entry, type EntryType } from "@/lib/db";
+import { accountTypeLabel, balanceClass, deleteItems, liveEntries, signedForAccount, useData, METHODS, ENTRY_TYPES, type Entry, type EntryType } from "@/lib/db";
 import { downloadFile, fmtDate, fmtPKR, fmtTime, toCSV, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +97,7 @@ function LedgerPage() {
        <div className="no-print mb-5 rounded-lg border bg-card p-5 sm:p-6">
          <div className="flex flex-wrap items-start justify-between gap-4">
            <div><h2 className="text-xl font-semibold sm:text-2xl">{a.name}</h2><span className="num text-sm text-muted-foreground">{a.code}</span></div>
-           <div className="text-left sm:text-right"><div className="text-xs uppercase text-muted-foreground">Balance</div><div className={cn("num text-xl font-semibold sm:text-2xl", closing >= 0 ? "text-success" : "text-destructive")}>{closing < 0 ? "−" : ""}{fmtPKR(Math.abs(closing))}</div><div className="text-xs text-muted-foreground">{closing > 0 ? "Receivable · Dr" : closing < 0 ? "Payable · Cr" : "Settled"}</div></div>
+           <div className="text-left sm:text-right"><div className="text-xs uppercase text-muted-foreground">Balance</div><div className={cn("num text-xl font-semibold sm:text-2xl", closing >= 0 ? "text-success" : "text-destructive")}>{closing < 0 ? "−" : ""}{fmtPKR(Math.abs(closing))}</div><div className="text-xs text-muted-foreground">{balanceClass(a, closing)}{closing > 0 ? " · Dr" : closing < 0 ? " · Cr" : ""}</div></div>
          </div>
          <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-1 text-sm"><dt className="text-muted-foreground">Type</dt><dd>{accountTypeLabel(d, a.type)}</dd>{a.phone && <><dt className="text-muted-foreground">Contact</dt><dd>{a.phone}</dd></>}{a.address && <><dt className="text-muted-foreground">Address</dt><dd>{a.address}</dd></>}</dl>
        </div>

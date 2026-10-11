@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -148,9 +148,9 @@ function OpeningPage() {
       <section className="rounded-lg border bg-card p-4">
         <h2 className="mb-3 font-semibold">Opening capital check</h2>
         <dl className="grid grid-cols-[1fr_auto] gap-x-6 gap-y-1 text-sm">
-          {([["Cash in hand", preview.cash], ["Banks", preview.banks], ["Receivables", preview.receivable], ["Supplier advances", preview.supplierAdvance], ["Stock value", preview.stock], ["Other assets", preview.otherAssets]] as const).map(([k, v]) => <><dt key={k}>{k}</dt><dd className="num text-right">{fmtPKR(v)}</dd></>)}
+          {([["Cash in hand", preview.cash], ["Banks", preview.banks], ["Receivables", preview.receivable], ["Supplier advances", preview.supplierAdvance], ["Stock value", preview.stock], ["Other assets", preview.otherAssets]] as const).map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd className="num text-right">{fmtPKR(v)}</dd></Fragment>)}
           <dt className="border-t pt-1 font-semibold">Total assets</dt><dd className="num border-t pt-1 text-right font-semibold">{fmtPKR(preview.assets)}</dd>
-          {([["Payables", preview.payable], ["Customer advances", preview.customerAdvance], ["Loans & other liabilities", preview.otherLiab]] as const).map(([k, v]) => <><dt key={k}>{k}</dt><dd className="num text-right">{fmtPKR(v)}</dd></>)}
+          {([["Payables", preview.payable], ["Customer advances", preview.customerAdvance], ["Loans & other liabilities", preview.otherLiab]] as const).map(([k, v]) => <Fragment key={k}><dt>{k}</dt><dd className="num text-right">{fmtPKR(v)}</dd></Fragment>)}
           <dt className="border-t pt-1 font-semibold">Total liabilities</dt><dd className="num border-t pt-1 text-right font-semibold">{fmtPKR(preview.liabilities)}</dd>
           <dt className="mt-2 text-base font-bold">Opening capital (equity)</dt><dd className="num mt-2 text-right text-base font-bold">{fmtPKR(preview.capital)}</dd>
         </dl>

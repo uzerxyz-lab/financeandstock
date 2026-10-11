@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { shareElementAsImage } from "@/lib/share-pdf";
 import { Button } from "@/components/ui/button";
 import { PrintHeader } from "@/components/app/inputs";
-import { useData, liveEntries, signedForAccount, ENTRY_TYPES, METHODS } from "@/lib/db";
+import { useData, liveEntries, signedForAccount, balanceClass, fundName, ENTRY_TYPES, METHODS } from "@/lib/db";
 import { amountInWords, fmtDate, fmtPKR, fmtTime } from "@/lib/format";
 
 export const Route = createFileRoute("/voucher/$id")({
@@ -42,7 +42,7 @@ function VoucherPage() {
   const a = d.accounts.find((x) => x.id === e.accountId);
   const previousBalance = a ? liveEntries(d).filter((x) => x.accountId === a.id && (x.date < e.date || (x.date === e.date && x.voucherNo < e.voucherNo))).reduce((balance, x) => balance + signedForAccount(x), a.openingBalance) : 0;
   const paymentNumber = e.method === "cheque" ? e.chequeNo : e.method === "online" ? e.reference : undefined;
-  const bankDetails = [e.bank?.trim(), paymentNumber?.trim()].filter(Boolean).join(" — ");
+  const bankDetails = e.type === "transfer" ? `${fundName(d, e.bankId ?? "cash")} → ${fundName(d, e.toBankId ?? "cash")}${e.reference ? ` — ${e.reference}` : ""}` : [e.bankId ? fundName(d, e.bankId) : e.bank?.trim(), paymentNumber?.trim()].filter(Boolean).join(" — ");
   const meta = ENTRY_TYPES[e.type];
   const title = meta.flow === "in" ? "Receipt Voucher" : meta.flow === "out" ? "Payment Voucher" : `${meta.label} Voucher`;
 
@@ -69,11 +69,12 @@ function VoucherPage() {
         <Row label={meta.flow === "in" ? "Received From" : meta.flow === "out" ? "Paid To" : "Account"} value={a ? `${a.name} (${a.code})` : undefined} />
         <Row label="Category" value={d.categories.find((c) => c.id === e.categoryId)?.name} />
         <Row label="Particulars" value={e.particulars} />
-        <Row label={e.type === "purchase" ? "Purchase Type" : "Sale Type"} value={e.type === "sale" || e.type === "purchase" ? e.payMode === "advance" ? "Net Payment" : "Credit Sale" : undefined} />
+        <Row label={e.type === "purchase" ? "Purchase Type" : "Sale Type"} value={e.type === "sale" || e.type === "purchase" ? e.payMode === "advance" ? (e.type === "purchase" ? "Paid Now" : "Received Now") : (e.type === "purchase" ? "Credit Purchase" : "Credit Sale") : undefined} />
         <Row label="Remarks" value={e.remarks} />
         <Row label="Payment Method" value={e.method ? METHODS[e.method] : undefined} />
-        <Row label="Bank" value={bankDetails || undefined} />
-        <Row label="Previous Balance" value={a ? `${fmtPKR(Math.abs(previousBalance))}${previousBalance > 0 ? " · Receivable (Dr)" : previousBalance < 0 ? " · Payable (Cr)" : " · Settled"}` : undefined} />
+        <Row label={e.type === "transfer" ? "Transfer" : "Bank"} value={bankDetails || undefined} />
+        <Row label="Cheque Status" value={e.method === "cheque" ? (e.chequeStatus ?? "pending").toUpperCase() : undefined} />
+        <Row label="Previous Balance" value={a ? `${fmtPKR(Math.abs(previousBalance))} · ${balanceClass(a, previousBalance)}${previousBalance > 0 ? " (Dr)" : previousBalance < 0 ? " (Cr)" : ""}` : undefined} />
         <div className="mt-6 rounded-md bg-surface p-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm uppercase tracking-wide text-muted-foreground">Amount</span>
