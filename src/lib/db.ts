@@ -633,7 +633,7 @@ export function partyTotals(d: Data) {
 }
 
 /* ---------- opening setup ---------- */
-export function saveOpening(o: Opening, partyOpenings: Record<string, number>, equityIds: string[], banks: { id?: string; name: string; accountNo?: string; openingBalance: number }[]) {
+export function saveOpening(o: Opening, partyOpenings: Record<string, number>, equityIds: string[], banks: { id?: string | undefined; name: string; accountNo?: string | undefined; openingBalance: number }[]) {
   commit((d) => {
     d.opening = o;
     for (const a of d.accounts) {

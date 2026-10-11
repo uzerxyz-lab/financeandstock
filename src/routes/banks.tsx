@@ -41,14 +41,14 @@ function BanksPage() {
   const save = () => {
     const amt = num(amount);
     if (dialog === "bank") {
-      if (!name.trim()) return toast.error("Enter bank name");
+      if (!name.trim()) { toast.error("Enter bank name"); return; }
       addBank({ name: name.trim(), accountNo: accNo.trim() || undefined, openingBalance: amt });
       toast.success("Bank account added");
     } else {
-      if (amt <= 0) return toast.error("Enter a valid amount");
+      if (amt <= 0) { toast.error("Enter a valid amount"); return; }
       if (dialog === "capital") { const e = addCapital({ date, amount: amt, fund: from, reference }); toast.success(`Capital saved · V-${e.voucherNo}`); }
       else {
-        if (!to || to === from) return toast.error("Choose two different accounts");
+        if (!to || to === from) { toast.error("Choose two different accounts"); return; }
         const e = addTransfer({ date, amount: amt, from, to, reference }); toast.success(`Transfer saved · V-${e.voucherNo}`);
       }
     }
