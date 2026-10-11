@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { AccountSearch, Field, NativeSelect, TitleInput } from "./inputs";
 import { useNamePrompt } from "./NameDialog";
 import {
-  addEntry, addNamed, addMaterial, updateEntry, findDuplicate, getData, useData,
+  addEntry, addNamed, addMaterial, addBank, liveBanks, updateEntry, findDuplicate, getData, useData,
   ENTRY_TYPES, METHODS, type Entry, type EntryType, type PayMethod,
 } from "@/lib/db";
 import { todayISO, amountInWords, fmtTon } from "@/lib/format";
@@ -25,6 +25,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   const [chequeNo, setChequeNo] = useState(initial?.chequeNo ?? "");
   const [bank, setBank] = useState(initial?.bank ?? "");
   const [reference, setReference] = useState(initial?.reference ?? "");
+  const [bankId, setBankId] = useState(initial?.bankId ?? "");
   const [particulars, setParticulars] = useState(initial?.particulars ?? "");
   const [remarks, setRemarks] = useState(initial?.remarks ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
@@ -53,7 +54,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const restoreDraft = () => {
     const dr = draft; if (!dr) return;
-    setType(dr["type"] as EntryType); setDate(dr["date"] ?? todayISO()); setAccountId(dr["accountId"]); setAmount(dr["amount"] ?? ""); setParticulars(dr["particulars"] ?? ""); setMethod((dr["method"] as PayMethod) ?? "cash"); setChequeNo(dr["chequeNo"] ?? ""); setBank(dr["bank"] ?? ""); setReference(dr["reference"] ?? ""); setCategoryId(dr["categoryId"] ?? ""); setFormKey((k) => k + 1);
+    setType(dr["type"] as EntryType); setDate(dr["date"] ?? todayISO()); setAccountId(dr["accountId"]); setAmount(dr["amount"] ?? ""); setParticulars(dr["particulars"] ?? ""); setMethod((dr["method"] as PayMethod) ?? "cash"); setChequeNo(dr["chequeNo"] ?? ""); setBank(dr["bank"] ?? ""); setReference(dr["reference"] ?? ""); setBankId(dr["bankId"] ?? ""); setCategoryId(dr["categoryId"] ?? ""); setFormKey((k) => k + 1);
     setRemarks(dr["remarks"] ?? ""); setMaterialId(dr["materialId"] ?? ""); setWeight(dr["weight"] ?? ""); setRate(dr["rate"] ?? ""); setPayMode(dr["payMode"] === "advance" ? "advance" : dr["payMode"] === "credit" ? "credit" : ""); setReceivedBy(dr["receivedBy"] ?? "");
     setDraft(null);
   };
@@ -62,11 +63,11 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   useEffect(() => {
     if (initial) return;
     const t = setTimeout(() => {
-      if (amount || particulars || accountId || remarks || weight || rate) localStorage.setItem(DRAFT, JSON.stringify({ type, date, accountId, amount, particulars, remarks, materialId, weight, rate, payMode, receivedBy, method, chequeNo, bank, reference, categoryId }));
+      if (amount || particulars || accountId || remarks || weight || rate) localStorage.setItem(DRAFT, JSON.stringify({ type, date, accountId, amount, particulars, remarks, materialId, weight, rate, payMode, receivedBy, method, chequeNo, bank, bankId, reference, categoryId }));
       else localStorage.removeItem(DRAFT);
     }, 1500);
     return () => clearTimeout(t);
-  }, [initial, type, date, accountId, amount, particulars, remarks, materialId, weight, rate, payMode, receivedBy, method, chequeNo, bank, reference, categoryId]);
+  }, [initial, type, date, accountId, amount, particulars, remarks, materialId, weight, rate, payMode, receivedBy, method, chequeNo, bank, bankId, reference, categoryId]);
 
   useEffect(() => {
     if (initial) return;
@@ -94,7 +95,9 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
     if (type === "expense" && !accountId) { fieldError("f-paidto", "Please select who this expense was paid to"); return; }
     if (trade && !materialId) { fieldError("f-material", "Please select the material"); return; }
     if (!amt || amt <= 0) { fieldError(trade && !wKg ? "f-weight" : trade && !rt ? "f-rate" : "f-amount", "Please enter weight and rate, or a valid amount"); return; }
+    if (showPay && method !== "cash" && !bankId) { fieldError("f-bank", "Please select the bank account"); return; }
     if (trade && !initial && !payMode) { fieldError("f-saletype", `Please select the ${type === "purchase" ? "purchase" : "sale"} type`); return; }
+    const bankName = d.banks.find((b) => b.id === bankId)?.name ?? bank;
     const matName = d.materials.find((m) => m.id === materialId)?.name ?? "";
     const tradeText = trade && wKg ? `${matName} ${fmtTon(wKg)}${rt ? ` @ Rs ${rt}/kg` : ""}` : matName;
     const payload = {
@@ -103,7 +106,8 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       accountId: meta.party || type === "expense" ? accountId : undefined,
       method: meta.cash ? method : undefined,
       chequeNo: meta.cash && method === "cheque" ? chequeNo : undefined,
-      bank: meta.cash && method !== "cash" ? bank : undefined,
+      bank: meta.cash && method !== "cash" ? bankName : undefined,
+      ...(type === "transfer" ? {} : { bankId: meta.cash && method !== "cash" ? bankId : undefined }),
       reference: meta.cash && method === "online" ? reference : undefined,
       chequeStatus: meta.cash && method === "cheque" ? initial?.chequeStatus ?? "pending" : undefined,
       categoryId: type === "expense" ? categoryId : undefined,
@@ -127,7 +131,8 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           type: type === "sale" ? "inward" : "outward", date, amount: amt, accountId,
           particulars: `Advance for V-${e.voucherNo} · ${tradeText}`, method,
           chequeNo: method === "cheque" ? chequeNo : undefined,
-          bank: method !== "cash" ? bank : undefined,
+          bank: method !== "cash" ? bankName : undefined,
+          bankId: method !== "cash" ? bankId : undefined,
           reference: method === "online" ? reference : undefined,
           chequeStatus: method === "cheque" ? "pending" : undefined,
           receivedBy: method === "cash" && receivedBy.trim() ? receivedBy.trim() : undefined,
@@ -248,8 +253,8 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           <Field id="f-saletype" label={type === "purchase" ? "Purchase Type *" : "Sale Type *"}>
             <NativeSelect value={payMode} onChange={(e) => setPayMode(e.target.value as "credit" | "advance")}>
               <option value="" disabled>Select {type === "purchase" ? "purchase" : "sale"} type…</option>
-              <option value="credit">Credit Sale</option>
-              <option value="advance">Net Payment</option>
+              <option value="credit">{type === "purchase" ? "Credit Purchase (payable)" : "Credit Sale (receivable)"}</option>
+              <option value="advance">{type === "purchase" ? "Paid Now" : "Received Now"}</option>
             </NativeSelect>
           </Field>
         )}
@@ -275,12 +280,21 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
             </Field>
           )}
           {method !== "cash" && (
-            <Field label="Bank Name (optional)">
-              <TitleInput value={bank} onValueChange={setBank} placeholder="e.g. Meezan Bank" />
+            <Field id="f-bank" label="Bank Account *">
+              <div className="flex gap-2">
+                <NativeSelect value={bankId} onChange={(e) => { setBankId(e.target.value); setBank(d.banks.find((b) => b.id === e.target.value)?.name ?? ""); }}>
+                  <option value="">Select bank…</option>
+                  {liveBanks(d).map((b) => <option key={b.id} value={b.id}>{b.name}{b.accountNo ? ` · ${b.accountNo}` : ""}</option>)}
+                </NativeSelect>
+                <Button type="button" variant="outline" size="sm" className="h-9" onClick={async () => {
+                  const name = await names.ask("New bank account", "e.g. Meezan Bank");
+                  if (name) { const b = addBank({ name: cap(name), openingBalance: 0 }); setBankId(b.id); setBank(b.name); }
+                }}>+ New</Button>
+              </div>
             </Field>
           )}
           {method === "online" && (
-            <Field label="Reference No.">
+            <Field label="Transaction Reference (optional)">
               <Input value={reference} onChange={(e) => setReference(e.target.value)} />
             </Field>
           )}

@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as BanksRouteImport } from './routes/banks'
 import { Route as CashbookRouteImport } from './routes/cashbook'
 import { Route as EntriesRouteImport } from './routes/entries'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as LoansRouteImport } from './routes/loans'
+import { Route as OpeningRouteImport } from './routes/opening'
 import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SalesRouteImport } from './routes/sales'
@@ -23,6 +25,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StockRouteImport } from './routes/stock'
 import { Route as VouchersRouteImport } from './routes/vouchers'
 import { Route as WorkersRouteImport } from './routes/workers'
+import { Route as BankIdRouteImport } from './routes/bank.$id'
 import { Route as LedgerIdRouteImport } from './routes/ledger.$id'
 import { Route as VoucherIdRouteImport } from './routes/voucher.$id'
 
@@ -39,6 +42,11 @@ const AccountsRoute = AccountsRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BanksRoute = BanksRouteImport.update({
+  id: '/banks',
+  path: '/banks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CashbookRoute = CashbookRouteImport.update({
@@ -59,6 +67,11 @@ const ExpensesRoute = ExpensesRouteImport.update({
 const LoansRoute = LoansRouteImport.update({
   id: '/loans',
   path: '/loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpeningRoute = OpeningRouteImport.update({
+  id: '/opening',
+  path: '/opening',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PurchasesRoute = PurchasesRouteImport.update({
@@ -96,6 +109,11 @@ const WorkersRoute = WorkersRouteImport.update({
   path: '/workers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BankIdRoute = BankIdRouteImport.update({
+  id: '/bank/$id',
+  path: '/bank/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LedgerIdRoute = LedgerIdRouteImport.update({
   id: '/ledger/$id',
   path: '/ledger/$id',
@@ -111,10 +129,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/admin': typeof AdminRoute
+  '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
+  '/opening': typeof OpeningRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -122,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/stock': typeof StockRoute
   '/vouchers': typeof VouchersRoute
   '/workers': typeof WorkersRoute
+  '/bank/$id': typeof BankIdRoute
   '/ledger/$id': typeof LedgerIdRoute
   '/voucher/$id': typeof VoucherIdRoute
 }
@@ -129,10 +150,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/admin': typeof AdminRoute
+  '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
+  '/opening': typeof OpeningRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -140,6 +163,7 @@ export interface FileRoutesByTo {
   '/stock': typeof StockRoute
   '/vouchers': typeof VouchersRoute
   '/workers': typeof WorkersRoute
+  '/bank/$id': typeof BankIdRoute
   '/ledger/$id': typeof LedgerIdRoute
   '/voucher/$id': typeof VoucherIdRoute
 }
@@ -148,10 +172,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/admin': typeof AdminRoute
+  '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
+  '/opening': typeof OpeningRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -159,6 +185,7 @@ export interface FileRoutesById {
   '/stock': typeof StockRoute
   '/vouchers': typeof VouchersRoute
   '/workers': typeof WorkersRoute
+  '/bank/$id': typeof BankIdRoute
   '/ledger/$id': typeof LedgerIdRoute
   '/voucher/$id': typeof VoucherIdRoute
 }
@@ -168,10 +195,12 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/admin'
+    | '/banks'
     | '/cashbook'
     | '/entries'
     | '/expenses'
     | '/loans'
+    | '/opening'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -179,6 +208,7 @@ export interface FileRouteTypes {
     | '/stock'
     | '/vouchers'
     | '/workers'
+    | '/bank/$id'
     | '/ledger/$id'
     | '/voucher/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -186,10 +216,12 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/admin'
+    | '/banks'
     | '/cashbook'
     | '/entries'
     | '/expenses'
     | '/loans'
+    | '/opening'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -197,6 +229,7 @@ export interface FileRouteTypes {
     | '/stock'
     | '/vouchers'
     | '/workers'
+    | '/bank/$id'
     | '/ledger/$id'
     | '/voucher/$id'
   id:
@@ -204,10 +237,12 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/admin'
+    | '/banks'
     | '/cashbook'
     | '/entries'
     | '/expenses'
     | '/loans'
+    | '/opening'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -215,6 +250,7 @@ export interface FileRouteTypes {
     | '/stock'
     | '/vouchers'
     | '/workers'
+    | '/bank/$id'
     | '/ledger/$id'
     | '/voucher/$id'
   fileRoutesById: FileRoutesById
@@ -223,10 +259,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AdminRoute: typeof AdminRoute
+  BanksRoute: typeof BanksRoute
   CashbookRoute: typeof CashbookRoute
   EntriesRoute: typeof EntriesRoute
   ExpensesRoute: typeof ExpensesRoute
   LoansRoute: typeof LoansRoute
+  OpeningRoute: typeof OpeningRoute
   PurchasesRoute: typeof PurchasesRoute
   ReportsRoute: typeof ReportsRoute
   SalesRoute: typeof SalesRoute
@@ -234,6 +272,7 @@ export interface RootRouteChildren {
   StockRoute: typeof StockRoute
   VouchersRoute: typeof VouchersRoute
   WorkersRoute: typeof WorkersRoute
+  BankIdRoute: typeof BankIdRoute
   LedgerIdRoute: typeof LedgerIdRoute
   VoucherIdRoute: typeof VoucherIdRoute
 }
@@ -259,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/banks': {
+      id: '/banks'
+      path: '/banks'
+      fullPath: '/banks'
+      preLoaderRoute: typeof BanksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cashbook': {
@@ -287,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/loans'
       fullPath: '/loans'
       preLoaderRoute: typeof LoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opening': {
+      id: '/opening'
+      path: '/opening'
+      fullPath: '/opening'
+      preLoaderRoute: typeof OpeningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purchases': {
@@ -338,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bank/$id': {
+      id: '/bank/$id'
+      path: '/bank/$id'
+      fullPath: '/bank/$id'
+      preLoaderRoute: typeof BankIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ledger/$id': {
       id: '/ledger/$id'
       path: '/ledger/$id'
@@ -359,10 +419,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AdminRoute: AdminRoute,
+  BanksRoute: BanksRoute,
   CashbookRoute: CashbookRoute,
   EntriesRoute: EntriesRoute,
   ExpensesRoute: ExpensesRoute,
   LoansRoute: LoansRoute,
+  OpeningRoute: OpeningRoute,
   PurchasesRoute: PurchasesRoute,
   ReportsRoute: ReportsRoute,
   SalesRoute: SalesRoute,
@@ -370,6 +432,7 @@ const rootRouteChildren: RootRouteChildren = {
   StockRoute: StockRoute,
   VouchersRoute: VouchersRoute,
   WorkersRoute: WorkersRoute,
+  BankIdRoute: BankIdRoute,
   LedgerIdRoute: LedgerIdRoute,
   VoucherIdRoute: VoucherIdRoute,
 }

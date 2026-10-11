@@ -27,6 +27,8 @@ const NAV = [
   { to: "/workers", label: "Workers", icon: Users },
   { to: "/loans", label: "Personal Loans", icon: HandCoins },
   { to: "/cashbook", label: "Cash Book", icon: Wallet },
+  { to: "/banks", label: "Cash & Banks", icon: Wallet },
+  { to: "/opening", label: "Opening Balances", icon: BookOpen },
   { to: "/expenses", label: "Expenses", icon: Receipt },
   { to: "/reports", label: "Reports", icon: BookOpen },
   { to: "/admin", label: "Admin Panel", icon: ShieldCheck },

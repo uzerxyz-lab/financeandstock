@@ -22,3 +22,5 @@
 - The shared Dialog wrapper pushes a history entry while open so the phone/browser Back key closes it first; AppShell shows Back + Dashboard controls on every non-dashboard page.
 - Database migrations are tracked by Drizzle in drizzle/migrations; the first file was marked applied by hand because the remixed database already held its table.
 - In-app update checks run only from the explicit menu action, comparing loaded script filenames with a fresh page fetch; alerts expire and deduplicate so normal use is never interrupted.
+- Money balances come from fund ledgers (cash in hand vs each bank, src/lib/db.ts fundLedger) and party balances separately; sales/purchases never move funds, and only cleared cheques count toward available bank balance — this prevents double-counting.
+- Owner capital is a "capital" entry or an equity-flagged account, never a party payable; opening capital is derived as assets minus liabilities.

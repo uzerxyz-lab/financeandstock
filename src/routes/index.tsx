@@ -7,7 +7,7 @@ import {
 import { EntryForm } from "@/components/app/EntryForm";
 import { AccountForm } from "@/components/app/AccountForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { accountBalance, cashFlow, inCashHand, liveAccounts, liveEntries, useData, ENTRY_TYPES, type EntryType } from "@/lib/db";
+import { CASH, fundList, liveAccounts, liveEntries, partyTotals, useData, ENTRY_TYPES, type EntryType } from "@/lib/db";
 import { fmtPKR, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
 });
 
 const ORDER_KEY = "cashbook-tile-order";
-const DEFAULT_ORDER = ["summary", "inflow", "outflow", "sale", "purchase", "account", "ledgers", "workers", "reports", "expense", "stock", "vouchers", "loans"];
+const DEFAULT_ORDER = ["summary", "inflow", "outflow", "sale", "purchase", "account", "ledgers", "workers", "reports", "expense", "stock", "vouchers", "loans", "banks"];
 type Tone = "received" | "paid" | "sale" | "purchase" | "account" | "ledger" | "report" | "expense" | "entries" | "admin" | "hero";
 const toneCls: Record<Tone, string> = {
   received: "bg-received text-hero-foreground",
@@ -60,20 +60,21 @@ function Dashboard() {
   const today = todayISO();
   const stats = useMemo(() => {
     const entries = liveEntries(d);
-    const todays = entries.filter((e) => e.date === today && e.chequeStatus !== "bounced");
-    const balances = liveAccounts(d).map((a) => accountBalance(d, a.id));
+    const todays = entries.filter((e) => e.date === today && e.chequeStatus !== "bounced" && e.type !== "capital");
+    const funds = fundList(d);
+    const parties = partyTotals(d);
     const totals: Record<string, number> = {};
     for (const e of entries) if (e.date.startsWith(today.slice(0, 7))) totals[e.type] = (totals[e.type] ?? 0) + e.amount;
     return {
       cashIn: todays.filter((e) => ENTRY_TYPES[e.type].flow === "in").reduce((s, e) => s + e.amount, 0),
       cashOut: todays.filter((e) => ENTRY_TYPES[e.type].flow === "out").reduce((s, e) => s + e.amount, 0),
-      cashInHand: entries.filter(inCashHand).reduce((s, e) => s + cashFlow(e), 0),
-      receivable: balances.filter((b) => b > 0).reduce((s, b) => s + b, 0),
-      payable: balances.filter((b) => b < 0).reduce((s, b) => s - b, 0),
+      cashInHand: funds.find((f) => f.id === CASH)?.closing ?? 0,
+      bankTotal: funds.filter((f) => f.id !== CASH).reduce((s, f) => s + f.closing, 0),
+      ...parties,
       totals,
     };
   }, [d, today]);
-  const { cashIn, cashOut, cashInHand, receivable, payable } = stats;
+  const { cashIn, cashOut, cashInHand, receivable, payable, bankTotal, supplierAdvance, customerAdvance } = stats;
   const mt = (t: EntryType) => stats.totals[t] ?? 0;
 
   const [order, setOrder] = useState(DEFAULT_ORDER);
@@ -177,8 +178,10 @@ function Dashboard() {
           <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
             <Mini label="Receivable" value={receivable} hidden={!showCash} />
             <Mini label="Payable" value={payable} hidden={!showCash} />
+            <Mini label="Bank balance" value={bankTotal} hidden={!showCash} />
+            <Mini label="Supplier advance" value={supplierAdvance} hidden={!showCash} />
+            {customerAdvance > 0 && <Mini label="Customer advance" value={customerAdvance} hidden={!showCash} />}
             <Mini label="Sales this month" value={mt("sale")} hidden={!showCash} />
-            <Mini label="Expenses this month" value={mt("expense")} hidden={!showCash} />
           </div>
         </div>
       </div>) },
@@ -194,10 +197,17 @@ function Dashboard() {
     stock: { span: "", node: <LinkTile tone="purchase" icon={Boxes} label="Stock" detail="Scrap, billet & material in tons" to="/stock" /> },
     vouchers: { span: "", node: <LinkTile tone="entries" icon={FileText} label="Vouchers" detail="Sales, purchases, receipts & payments" to="/vouchers" /> },
     loans: { span: "", node: <LinkTile tone="admin" icon={HandCoins} label="Personal Loans" detail="Given, taken and repayment tracking" to="/loans" /> },
+    banks: { span: "", node: <LinkTile tone="ledger" icon={Wallet} label="Cash & Banks" detail="Bank statements, capital & transfers" to="/banks" /> },
   };
 
   return (
     <div className="space-y-5 pb-10">
+      {!d.opening?.completed && (
+        <Link to="/opening" className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm">
+          <span><span className="font-semibold">Complete your Opening Setup</span> — enter cash, bank, party, stock and loan balances on your start date.</span>
+          <span className="font-semibold text-primary">Start →</span>
+        </Link>
+      )}
       <div className="grid auto-rows-[minmax(150px,auto)] grid-flow-dense grid-cols-2 gap-3 md:grid-cols-4 sm:gap-4">
         {order.map((k) => {
           const t = tiles[k]; if (!t) return null;
@@ -272,7 +282,7 @@ function ActionTile({ tone, icon, label, detail, onClick }: { tone: Tone; icon: 
     </button>
   );
 }
-function LinkTile({ tone, icon, label, detail, to }: { tone: Tone; icon: typeof Wallet; label: string; detail: string; to: "/accounts" | "/reports" | "/workers" | "/loans" | "/sales" | "/purchases" | "/stock" | "/vouchers" }) {
+function LinkTile({ tone, icon, label, detail, to }: { tone: Tone; icon: typeof Wallet; label: string; detail: string; to: "/accounts" | "/reports" | "/workers" | "/loans" | "/sales" | "/purchases" | "/stock" | "/vouchers" | "/banks" }) {
   return (
     <Link to={to} className={cn(tileBase, softCls[tone])}>
       <Head icon={icon} label="" tone={tone} />

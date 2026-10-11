@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EntriesTable } from "@/components/app/EntriesTable";
 import { Field, PageHeader, PrintHeader } from "@/components/app/inputs";
-import { cashFlow, inCashHand, liveEntries, updateEntry, useData, ENTRY_TYPES, type ChequeStatus } from "@/lib/db";
+import { CASH, fundLedger, fundList, liveEntries, updateEntry, useData, type ChequeStatus } from "@/lib/db";
+import { Link } from "@tanstack/react-router";
 import { fmtDate, fmtPKR, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -30,18 +31,16 @@ function CashBook() {
   const [counted, setCounted] = useState("");
   const all = liveEntries(d);
 
-  const cashInHand = all.filter(inCashHand).reduce((s, e) => s + cashFlow(e), 0);
-  const bank = all.filter((e) => e.method === "online").reduce((s, e) => s + cashFlow(e), 0);
+  const cashInHand = fundLedger(d, CASH).closing;
+  const bank = fundList(d).filter((f) => f.id !== CASH).reduce((s, f) => s + f.closing, 0);
   const pending = all.filter((e) => e.method === "cheque" && e.chequeStatus === "pending");
 
   const { opening, rows, inT, outT } = useMemo(() => {
-    const cash = all.filter((e) => ENTRY_TYPES[e.type].cash);
-    const opening = cash.filter((e) => e.date < from).reduce((s, e) => s + cashFlow(e), 0);
-    const rows = cash.filter((e) => e.date >= from && e.date <= to).sort((a, b) => a.date.localeCompare(b.date) || a.voucherNo - b.voucherNo);
-    const inT = rows.filter((e) => ENTRY_TYPES[e.type].flow === "in").reduce((s, e) => s + cashFlow(e), 0);
-    const outT = -rows.filter((e) => ENTRY_TYPES[e.type].flow === "out").reduce((s, e) => s + cashFlow(e), 0);
-    return { opening, rows, inT, outT };
-  }, [all, from, to]);
+    const l = fundLedger(d, CASH, from, to);
+    const inT = l.rows.filter((m) => m.delta > 0).reduce((s, m) => s + m.delta, 0);
+    const outT = -l.rows.filter((m) => m.delta < 0).reduce((s, m) => s + m.delta, 0);
+    return { opening: l.opening, rows: l.rows.map((m) => m.e), inT, outT };
+  }, [d, from, to]);
 
   const diff = counted ? Number(counted.replace(/,/g, "")) - cashInHand : 0;
 
@@ -52,7 +51,7 @@ function CashBook() {
 
       <div className="no-print grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border bg-card p-4"><div className="text-xs uppercase text-muted-foreground">Cash in Hand</div><div className="num mt-2 text-2xl font-semibold">{fmtPKR(cashInHand)}</div></div>
-        <div className="rounded-lg border bg-card p-4"><div className="text-xs uppercase text-muted-foreground">Bank / Online</div><div className="num mt-2 text-2xl font-semibold">{fmtPKR(bank)}</div></div>
+        <div className="rounded-lg border bg-card p-4"><div className="text-xs uppercase text-muted-foreground">All Banks (cleared)</div><div className="num mt-2 text-2xl font-semibold">{fmtPKR(bank)}</div><Link to="/banks" className="text-xs text-primary hover:underline">Bank statements →</Link></div>
         <div className="rounded-lg border bg-card p-4"><div className="text-xs uppercase text-muted-foreground">Cheques Pending ({pending.length})</div><div className="num mt-2 text-2xl font-semibold text-warning">{fmtPKR(pending.reduce((s, e) => s + e.amount, 0))}</div></div>
       </div>
 
@@ -75,7 +74,7 @@ function CashBook() {
           <ul className="divide-y text-sm">
             {pending.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                <span>V-{e.voucherNo} · {fmtDate(e.date)} · {d.accounts.find((a) => a.id === e.accountId)?.name} · Chq #{e.chequeNo || "—"} {e.bank}</span>
+                <span>V-{e.voucherNo} · {fmtDate(e.date)} · {d.accounts.find((a) => a.id === e.accountId)?.name} · Chq #{e.chequeNo || "—"} {d.banks.find((b) => b.id === e.bankId)?.name ?? e.bank}</span>
                 <span className="flex items-center gap-2">
                   <span className="num font-medium">{fmtPKR(e.amount)}</span>
                   {(["cleared", "bounced"] as ChequeStatus[]).map((s) => (

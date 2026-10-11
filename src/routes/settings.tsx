@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Download, RotateCcw, Upload } from "lucide-react";
@@ -37,6 +37,7 @@ function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Settings & Backup" />
+      <Link to="/opening" className="mb-4 flex items-center justify-between rounded-lg border bg-card px-4 py-3 text-sm hover:border-primary/40"><span><span className="font-semibold">Opening Balances</span> — cash, banks, parties, stock, loans and opening capital</span><span className="text-primary">Open →</span></Link>
       <div className="grid gap-6 lg:grid-cols-2">
         <CloudBackup />
         <form className="space-y-4 rounded-lg border bg-card p-5" onSubmit={(e) => { e.preventDefault(); updateCompany(c); toast.success("Company details saved"); }}>
