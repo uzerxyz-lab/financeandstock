@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 const store: Record<string, string> = {};
+vi.stubGlobal("sessionStorage", { clear: () => {} });
 vi.stubGlobal("localStorage", { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; }, key: () => null, length: 0 });
 
 const db = await import("../db");
