@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { norm } from "./format";
 
 export type AccountType = "buyer" | "supplier" | "worker" | string;
-export type EntryType = "inward" | "outward" | "sale" | "purchase" | "salary" | "advance" | "expense";
+export type EntryType = "inward" | "outward" | "sale" | "purchase" | "salary" | "advance" | "expense" | "capital" | "transfer";
 export type PayMethod = "cash" | "cheque" | "online";
 export type ChequeStatus = "pending" | "cleared" | "bounced";
 
@@ -17,8 +17,28 @@ export interface Account {
   title?: string | undefined;
   fixedWages?: number | undefined;
   idCard?: string | undefined;
+  /** Owner capital / equity holder — not a party; excluded from receivables and payables. */
+  equity?: boolean | undefined;
   createdAt: string;
   deletedAt?: string | undefined;
+}
+
+export interface Bank {
+  id: string;
+  name: string;
+  accountNo?: string | undefined;
+  openingBalance: number;
+  createdAt: string;
+  deletedAt?: string | undefined;
+}
+
+export interface OpeningItem { id: string; name: string; kind: "asset" | "liability"; amount: number }
+export interface Opening {
+  date: string;
+  cash: number;
+  stock: { materialId: string; kg: number; value: number }[];
+  others: OpeningItem[];
+  completed?: boolean | undefined;
 }
 
 export interface Entry {
@@ -31,6 +51,10 @@ export interface Entry {
   method?: PayMethod | undefined;
   chequeNo?: string | undefined;
   bank?: string | undefined;
+  /** Bank fund this payment moves through (online / cheque). For transfers: source fund ("cash" or bank id). */
+  bankId?: string | undefined;
+  /** Transfers only: destination fund ("cash" or bank id). */
+  toBankId?: string | undefined;
   reference?: string | undefined;
   chequeStatus?: ChequeStatus | undefined;
   particulars: string;
@@ -109,6 +133,8 @@ export interface Data {
   categoryChoicesMigrated?: boolean;
   accountTypes: Named[];
   loans: Loan[];
+  banks: Bank[];
+  opening?: Opening | undefined;
   materials: Named[];
   production: Production[];
   log: LogItem[];
@@ -119,13 +145,15 @@ export interface Data {
 }
 
 export const ENTRY_TYPES: Record<EntryType, { label: string; cash: boolean; party: boolean; flow: "in" | "out" | "none" }> = {
-  inward: { label: "Cash Inward", cash: true, party: true, flow: "in" },
-  outward: { label: "Cash Outward", cash: true, party: true, flow: "out" },
+  inward: { label: "Receive Payment", cash: true, party: true, flow: "in" },
+  outward: { label: "Issue Payment", cash: true, party: true, flow: "out" },
   sale: { label: "Sale", cash: false, party: true, flow: "none" },
   purchase: { label: "Purchase", cash: false, party: true, flow: "none" },
   salary: { label: "Salary", cash: true, party: true, flow: "out" },
   advance: { label: "Advance", cash: true, party: true, flow: "out" },
   expense: { label: "Expense", cash: true, party: false, flow: "out" },
+  capital: { label: "Capital Introduced", cash: true, party: false, flow: "in" },
+  transfer: { label: "Internal Transfer", cash: false, party: false, flow: "none" },
 };
 
 export const METHODS: Record<PayMethod, string> = { cash: "Cash", cheque: "Cheque", online: "Online Transfer" };
@@ -155,6 +183,7 @@ function empty(): Data {
     categoryChoicesMigrated: true,
     accountTypes: [],
     loans: [],
+    banks: [],
     materials: [
       { id: "mat-scrap", name: "Scrap" },
       { id: "mat-boora", name: "Boora" },
@@ -178,6 +207,30 @@ const subscribe = (l: () => void) => {
   listeners.add(l);
   return () => listeners.delete(l);
 };
+
+export const CASH = "cash";
+export const UNASSIGNED_BANK = "bank-unassigned";
+
+/** Additive, idempotent upgrade of older data: fills defaults and links legacy bank names to bank records. Never deletes. */
+export function migrate(d: Data, newId: () => string = uid) {
+  d.banks = d.banks ?? [];
+  d.accountTypes = d.accountTypes ?? [];
+  d.loans = d.loans ?? [];
+  d.production = d.production ?? [];
+  let changed = false;
+  for (const e of d.entries) {
+    if (e.type === "transfer" || !e.method || e.method === "cash" || e.bankId) continue;
+    const name = e.bank?.trim();
+    let b = name ? d.banks.find((x) => norm(x.name) === norm(name)) : d.banks.find((x) => x.id === UNASSIGNED_BANK);
+    if (!b) {
+      b = { id: name ? newId() : UNASSIGNED_BANK, name: name || "Unassigned Bank", openingBalance: 0, createdAt: new Date().toISOString() };
+      d.banks.push(b);
+    }
+    e.bankId = b.id;
+    changed = true;
+  }
+  return changed;
+}
 
 function persist() {
   localStorage.setItem(KEY, JSON.stringify(data));
@@ -203,6 +256,7 @@ export function loadData() {
       data = { ...base, ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? base.materials, production: incoming.production ?? [] } as Data;
       data.accounts = (incoming.accounts ?? []).map((a) => ({ ...a, type: a.type === "customer" || a.type === "other" ? "buyer" : a.type }));
       data.entries = (incoming.entries ?? []).map((e) => { const { tagId: _legacyTag, ...entry } = e as Entry & { tagId?: string }; return entry; });
+      if (migrate(data)) persist();
       const wanted = ["Salary", "Advance", "LESCO Bill", "Fuel", "Grocery"];
       const existing = new Set(data.categories.map((c) => norm(c.name)));
       wanted.forEach((name) => { if (!existing.has(norm(name))) data.categories.push({ id: uid(), name }); });
@@ -457,6 +511,8 @@ export const liveEntries = (d: Data) => d.entries.filter((e) => !e.deletedAt);
 
 /** Debit (+) increases what party owes us; credit (-) decreases. */
 export function signedForAccount(e: Entry) {
+  // A bounced cheque never settled anything: the party's original due is restored.
+  if (e.chequeStatus === "bounced") return 0;
   switch (e.type) {
     case "sale":
     case "outward":
@@ -484,8 +540,132 @@ export function cashFlow(e: Entry) {
   return f === "in" ? e.amount : f === "out" ? -e.amount : 0;
 }
 
-/** Cash in hand = cash + online transfers + cheques once marked cleared. Pending/bounced cheques excluded. */
-export const inCashHand = (e: Entry) => e.method === "cash" || e.method === "online" || (e.method === "cheque" && e.chequeStatus === "cleared");
+/** Cash in hand = physical cash only. Online and cheque payments live in their bank's ledger. */
+export const inCashHand = (e: Entry) => e.type !== "transfer" && ENTRY_TYPES[e.type].cash && (e.method === "cash" || !e.method);
+
+/* ---------- funds: cash in hand + each bank ---------- */
+export type FundState = "cleared" | "pending" | "bounced";
+export const entryState = (e: Entry): FundState => (e.method === "cheque" ? e.chequeStatus ?? "pending" : "cleared");
+
+/** Which fund(s) an entry moves and by how much (+ in, − out), ignoring cheque state. Sales/purchases move no money. */
+export function entryFunds(e: Entry): { fund: string; delta: number }[] {
+  if (e.type === "transfer") return [{ fund: e.bankId ?? CASH, delta: -e.amount }, { fund: e.toBankId ?? CASH, delta: e.amount }];
+  const flow = ENTRY_TYPES[e.type].flow;
+  if (flow === "none") return [];
+  const fund = !e.method || e.method === "cash" ? CASH : e.bankId ?? UNASSIGNED_BANK;
+  return [{ fund, delta: flow === "in" ? e.amount : -e.amount }];
+}
+
+export const liveBanks = (d: Data) => d.banks.filter((b) => !b.deletedAt);
+export function fundName(d: Data, fund: string) {
+  return fund === CASH ? "Cash in Hand" : d.banks.find((b) => b.id === fund)?.name ?? "Unassigned Bank";
+}
+export function fundOpening(d: Data, fund: string) {
+  return fund === CASH ? d.opening?.cash ?? 0 : d.banks.find((b) => b.id === fund)?.openingBalance ?? 0;
+}
+
+/** Running statement for one fund. Balance counts cleared items only; pending cheques are listed separately. */
+export function fundLedger(d: Data, fund: string, from = "", to = "") {
+  const moves = liveEntries(d)
+    .flatMap((e) => entryFunds(e).filter((m) => m.fund === fund).map((m) => ({ e, delta: m.delta, state: entryState(e) })))
+    .sort((a, b) => a.e.date.localeCompare(b.e.date) || a.e.voucherNo - b.e.voucherNo);
+  let bal = fundOpening(d, fund);
+  for (const m of moves) if (from && m.e.date < from && m.state === "cleared") bal += m.delta;
+  const opening = bal;
+  const rows = moves.filter((m) => (!from || m.e.date >= from) && (!to || m.e.date <= to)).map((m) => {
+    if (m.state === "cleared") bal += m.delta;
+    return { ...m, bal };
+  });
+  const pending = moves.filter((m) => m.state === "pending").reduce((s, m) => s + m.delta, 0);
+  return { opening, rows, closing: bal, pending };
+}
+export const fundBalance = (d: Data, fund: string) => fundLedger(d, fund).closing;
+export function fundList(d: Data) {
+  const ids = [CASH, ...liveBanks(d).map((b) => b.id)];
+  return ids.map((id) => ({ id, name: fundName(d, id), ...fundLedger(d, id) }));
+}
+
+export function addBank(b: Pick<Bank, "name" | "accountNo" | "openingBalance">) {
+  const bank: Bank = { ...b, id: uid(), createdAt: new Date().toISOString() };
+  commit((d) => { d.banks.push(bank); });
+  return bank;
+}
+export function updateBank(id: string, patch: Partial<Bank>) {
+  commit((d) => { const b = d.banks.find((x) => x.id === id); if (b) Object.assign(b, patch); });
+}
+
+/** Owner capital goes straight into the chosen cash/bank fund — never into a party ledger. */
+export function addCapital(input: { date: string; amount: number; fund: string; reference?: string; particulars?: string }) {
+  return addEntry({
+    type: "capital", date: input.date, amount: input.amount,
+    method: input.fund === CASH ? "cash" : "online",
+    bankId: input.fund === CASH ? undefined : input.fund,
+    bank: input.fund === CASH ? undefined : fundName(data, input.fund),
+    reference: input.reference || undefined,
+    particulars: input.particulars?.trim() || "Capital introduced by owner",
+  });
+}
+/** Moving money between own funds is neither income nor expense. */
+export function addTransfer(input: { date: string; amount: number; from: string; to: string; reference?: string; particulars?: string }) {
+  return addEntry({
+    type: "transfer", date: input.date, amount: input.amount, method: "online",
+    bankId: input.from, toBankId: input.to, reference: input.reference || undefined,
+    particulars: input.particulars?.trim() || `Transfer ${fundName(data, input.from)} → ${fundName(data, input.to)}`,
+  });
+}
+
+/* ---------- party classification ---------- */
+export function balanceClass(a: Pick<Account, "type" | "equity">, b: number) {
+  if (a.equity) return "Owner Capital";
+  if (b > 0) return a.type === "supplier" ? "Supplier Advance" : "Receivable";
+  if (b < 0) return a.type === "buyer" ? "Customer Advance" : "Payable";
+  return "Settled";
+}
+export function partyTotals(d: Data) {
+  const t = { receivable: 0, payable: 0, supplierAdvance: 0, customerAdvance: 0 };
+  for (const a of liveAccounts(d)) {
+    if (a.equity) continue;
+    const b = accountBalance(d, a.id);
+    if (b > 0) { if (a.type === "supplier") t.supplierAdvance += b; else t.receivable += b; }
+    if (b < 0) { if (a.type === "buyer") t.customerAdvance -= b; else t.payable -= b; }
+  }
+  return t;
+}
+
+/* ---------- opening setup ---------- */
+export function saveOpening(o: Opening, partyOpenings: Record<string, number>, equityIds: string[], banks: { id?: string; name: string; accountNo?: string; openingBalance: number }[]) {
+  commit((d) => {
+    d.opening = o;
+    for (const a of d.accounts) {
+      if (a.id in partyOpenings) a.openingBalance = partyOpenings[a.id]!;
+      a.equity = equityIds.includes(a.id) || undefined;
+    }
+    for (const b of banks) {
+      const ex = b.id ? d.banks.find((x) => x.id === b.id) : undefined;
+      if (ex) Object.assign(ex, { name: b.name, accountNo: b.accountNo, openingBalance: b.openingBalance });
+      else if (b.name.trim()) d.banks.push({ id: uid(), name: b.name.trim(), accountNo: b.accountNo, openingBalance: b.openingBalance, createdAt: new Date().toISOString() });
+    }
+  });
+}
+/** Opening capital = opening assets − opening liabilities (owner equity is never a payable). */
+export function openingCapital(d: Data) {
+  const o = d.opening;
+  const banks = liveBanks(d).reduce((s, b) => s + b.openingBalance, 0);
+  const cash = o?.cash ?? 0;
+  let receivable = 0, supplierAdvance = 0, payable = 0, customerAdvance = 0;
+  for (const a of liveAccounts(d)) {
+    if (a.equity) continue;
+    const b = a.openingBalance;
+    if (b > 0) { if (a.type === "supplier") supplierAdvance += b; else receivable += b; }
+    if (b < 0) { if (a.type === "buyer") customerAdvance -= b; else payable -= b; }
+  }
+  const stock = (o?.stock ?? []).reduce((s, x) => s + x.value, 0);
+  const otherAssets = (o?.others ?? []).filter((x) => x.kind === "asset").reduce((s, x) => s + x.amount, 0);
+  const otherLiab = (o?.others ?? []).filter((x) => x.kind === "liability").reduce((s, x) => s + x.amount, 0);
+  const assets = cash + banks + receivable + supplierAdvance + stock + otherAssets;
+  const liabilities = payable + customerAdvance + otherLiab;
+  return { cash, banks, receivable, supplierAdvance, stock, otherAssets, payable, customerAdvance, otherLiab, assets, liabilities, capital: assets - liabilities };
+}
 
 export function searchAccounts(d: Data, q: string, limit = 8, type?: AccountType) {
   const n = norm(q);
@@ -536,6 +716,7 @@ export function stockSummary(d: Data) {
   const rows = new Map<string, { purchased: number; sold: number; produced: number; consumed: number }>();
   const row = (id: string) => { let r = rows.get(id); if (!r) { r = { purchased: 0, sold: 0, produced: 0, consumed: 0 }; rows.set(id, r); } return r; };
   d.materials.forEach((m) => row(m.id));
+  for (const s of d.opening?.stock ?? []) row(s.materialId).purchased += s.kg;
   for (const e of liveEntries(d)) {
     if (!e.materialId || !e.weightKg) continue;
     if (e.type === "purchase") row(e.materialId).purchased += e.weightKg;
@@ -555,6 +736,7 @@ export function importJSON(text: string) {
   if (!Array.isArray(incoming.accounts) || !Array.isArray(incoming.entries)) throw new Error("Invalid backup file");
   commit((d) => {
     Object.assign(d, { ...empty(), ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? empty().materials, production: incoming.production ?? [], auth: d.auth ?? incoming.auth });
+    migrate(d);
   });
 }
 
@@ -576,7 +758,7 @@ export function restoreSnapshot(at: string) {
   const s = getSnapshots().find((x) => x.at === at);
   if (!s) return;
   const parsed = JSON.parse(s.data);
-  commit((d) => { Object.assign(d, { ...empty(), ...parsed, auth: d.auth }); });
+  commit((d) => { Object.assign(d, { ...empty(), ...parsed, auth: d.auth }); migrate(d); });
 }
 export async function changePassword(pin: string) {
   const hash = await hashPw(pin);
