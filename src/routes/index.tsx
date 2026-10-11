@@ -282,7 +282,7 @@ function ActionTile({ tone, icon, label, detail, onClick }: { tone: Tone; icon: 
     </button>
   );
 }
-function LinkTile({ tone, icon, label, detail, to }: { tone: Tone; icon: typeof Wallet; label: string; detail: string; to: "/accounts" | "/reports" | "/workers" | "/loans" | "/sales" | "/purchases" | "/stock" | "/vouchers" }) {
+function LinkTile({ tone, icon, label, detail, to }: { tone: Tone; icon: typeof Wallet; label: string; detail: string; to: "/accounts" | "/reports" | "/workers" | "/loans" | "/sales" | "/purchases" | "/stock" | "/vouchers" | "/banks" }) {
   return (
     <Link to={to} className={cn(tileBase, softCls[tone])}>
       <Head icon={icon} label="" tone={tone} />
