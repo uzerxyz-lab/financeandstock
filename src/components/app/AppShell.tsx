@@ -210,7 +210,6 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (needsSetup && !firstRun) { setSetupOpen(true); return; }
     if ((needUser && !username.trim()) || !pw) { toast.error(needUser ? "Username and PIN are required" : "PIN is required"); return; }
     setBusy(true);
     if (forgot) {
@@ -302,11 +301,6 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
             </Field>
           )}
           <Button type="submit" className="w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
-          {needsSetup && (
-            <Button type="button" variant="link" className="w-full text-login-foreground" onClick={() => setSetupOpen((v) => !v)}>
-              {firstRun ? "Back to sign in" : "Set Up Your Cash Control"}
-            </Button>
-          )}
           {!needsSetup && (
             <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full">
               {forgot ? "Back to sign in" : "Forgot password?"}
