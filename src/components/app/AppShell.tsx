@@ -293,7 +293,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
           )}
           {(firstRun || forgot) && <Field label="Recovery Email or Phone"><Input value={recovery} onChange={(e) => setRecovery(e.target.value)} /></Field>}
           <Field label={forgot ? "New PIN" : "PIN"}>
-            <Input type="password" inputMode="numeric" value={pw} onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 8))} />
+            <Input autoFocus={!needUser} type="password" inputMode="numeric" value={pw} onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 8))} />
           </Field>
           {(firstRun || forgot) && (
             <Field label="Confirm PIN">
