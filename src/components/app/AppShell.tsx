@@ -196,7 +196,9 @@ function PageBackBar() {
   );
 }
 
-function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDone: () => void; requireUsername: boolean }) {
+function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: boolean; onDone: () => void; requireUsername: boolean }) {
+  const [setupOpen, setSetupOpen] = useState(false);
+  const firstRun = needsSetup && setupOpen;
   const [company, setCompany] = useState("Mussa Enterprises");
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
@@ -208,6 +210,7 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (needsSetup && !firstRun) { setSetupOpen(true); return; }
     if ((needUser && !username.trim()) || !pw) { toast.error(needUser ? "Username and PIN are required" : "PIN is required"); return; }
     setBusy(true);
     if (forgot) {
@@ -233,52 +236,51 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
   };
 
   return (
-    <div className="relative grid min-h-screen bg-[#5f6e88] lg:grid-cols-[58%_42%]">
+    <div className="login-screen relative grid min-h-screen bg-login-backdrop md:grid-cols-[58%_42%]">
       {/* Mobile backdrop: same industrial photo + dark overlay behind the glass card */}
-      <div aria-hidden="true" className="absolute inset-0 lg:hidden">
+      <div aria-hidden="true" className="absolute inset-0 md:hidden">
         <img src={loginBg.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/70 via-[#0f172a]/55 to-[#0a0f1d]/70" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,8,18,.55)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-login-glass/70 via-login-tint/55 to-login-glass/70" />
+        <div className="login-mobile-vignette absolute inset-0" />
       </div>
       {/* Mobile corner accents */}
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-[5rem] font-light leading-none text-white/50 lg:hidden">
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-[5rem] font-light leading-none text-login-foreground/50 md:hidden">
         <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span><span className="login-chev login-chev-3">›</span>
       </div>
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-[2.5rem] font-light leading-none text-white/50 lg:hidden">
+      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-[2.5rem] font-light leading-none text-login-foreground/50 md:hidden">
         <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span>
       </div>
-      <div className="pointer-events-none absolute bottom-4 right-5 z-10 flex items-center gap-1.5 text-[10px] text-white/70 lg:hidden">
+      <div className="pointer-events-none absolute bottom-4 right-5 z-10 flex items-center gap-1.5 text-[10px] text-login-foreground/70 md:hidden">
         <span>Developed by</span>
         <img src={nexumLogo.url} alt="nexum systems" className="h-4 w-auto object-contain" />
       </div>
       <div
-        className="relative z-10 hidden flex-col justify-between overflow-hidden py-12 pl-12 pr-[22%] text-white lg:flex"
-        style={{ clipPath: "polygon(0 0, 80% 0, 100% 50%, 80% 100%, 0 100%)", filter: "drop-shadow(12px 0 24px rgba(0,0,0,.35))" }}
+        className="login-split-panel relative z-10 hidden flex-col justify-between gap-12 overflow-hidden py-12 pl-8 pr-[22%] text-login-foreground md:flex lg:pl-12"
       >
         <img src={loginBg.url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d]/90 via-[#0f172a]/75 to-[#0a0f1d]/85" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(5,8,18,.7)_100%)]" />
-        <div className="relative text-xs uppercase tracking-widest text-white/70">Mussa Enterprises · Finance Control</div>
+        <div className="absolute inset-0 bg-gradient-to-br from-login-glass/90 via-login-tint/75 to-login-glass/85" />
+        <div className="login-desktop-vignette absolute inset-0" />
+        <div className="relative text-xs uppercase text-login-foreground/70">Mussa Enterprises · Finance Control</div>
         <div className="relative">
-          <h2 className="text-4xl font-semibold leading-tight xl:text-5xl">
+          <h2 className="text-3xl font-semibold leading-tight lg:text-4xl xl:text-5xl">
             Control your business<br />and finance your way
-            <span className="ml-1 inline-flex items-baseline text-[0.78em] text-white/75">
+            <span className="ml-1 inline-flex items-baseline text-[0.78em] text-login-foreground/75">
               …<span className="login-chev ml-1">›</span><span className="login-chev login-chev-2">›</span>
             </span>
           </h2>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-white/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-login-foreground/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
         </div>
-        <div className="relative flex items-center gap-2 text-xs text-white/70">
+        <div className="relative flex items-center gap-2 text-xs text-login-foreground/70">
           <span>Developed by</span>
           <img src={nexumLogo.url} alt="nexum systems" className="h-5 w-auto object-contain" />
         </div>
       </div>
-      <div className="relative flex items-center justify-center p-6">
-        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-white/15 bg-[#0a0f1d]/40 p-8 text-white shadow-2xl backdrop-blur-md lg:border-white/10 lg:bg-[#0a0f1d]/65 lg:backdrop-blur-xl">
+      <div className="relative flex min-w-0 items-center justify-center px-6 py-24 md:px-4 md:py-8 lg:px-6">
+        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-login-foreground/15 bg-login-glass/40 p-6 text-login-foreground shadow-2xl backdrop-blur-md md:border-login-foreground/10 md:bg-login-glass/65 md:backdrop-blur-xl lg:p-8">
           <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
-          <div className="border-t border-white/10 pt-4">
+          <div className="border-t border-login-foreground/10 pt-4">
             <h1 className="text-xl font-semibold">{firstRun ? "Set Up Your Cash Control" : forgot ? "Reset password" : "Sign in"}</h1>
-            <p className="mt-1 text-sm text-white/60">{firstRun ? "Configure master PIN and business access to secure your ledger." : forgot ? "Confirm your username and registered email or phone." : needUser ? "Enter your username and PIN." : "Enter your PIN to unlock."}</p>
+            <p className="mt-1 text-sm text-login-foreground/60">{firstRun ? "Configure master PIN and business access to secure your ledger." : forgot ? "Confirm your username and registered email or phone." : needUser ? "Enter your username and PIN." : "Enter your PIN to unlock."}</p>
           </div>
           {(firstRun || forgot) && (
             <Field label="Company / Business Name">
@@ -300,10 +302,15 @@ function Login({ firstRun, onDone, requireUsername }: { firstRun: boolean; onDon
             </Field>
           )}
           <Button type="submit" className="w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
-          {!firstRun && (
-            <button type="button" onClick={() => setForgot((v) => !v)} className="w-full text-center text-sm text-primary hover:underline">
+          {needsSetup && (
+            <Button type="button" variant="link" className="w-full text-login-foreground" onClick={() => setSetupOpen((v) => !v)}>
+              {firstRun ? "Back to sign in" : "Set Up Your Cash Control"}
+            </Button>
+          )}
+          {!needsSetup && (
+            <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full">
               {forgot ? "Back to sign in" : "Forgot password?"}
-            </button>
+            </Button>
           )}
         </form>
       </div>
