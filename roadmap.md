@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add left-photo dotted mesh and double-size red filled right-pointing arrows with reference-style motion
 - [x] Restore split desktop login landing and make first-time setup explicitly accessible without accounting changes
 - [x] Correct Purchase Type label, PIN-to-edit transition, previous voucher balance and combined bank/number line
 - [x] Remove automatic update alerts and embed theme-aware app/voucher logos without separate network requests
