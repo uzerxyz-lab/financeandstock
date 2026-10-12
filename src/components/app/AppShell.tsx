@@ -197,8 +197,8 @@ function PageBackBar() {
 }
 
 function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: boolean; onDone: () => void; requireUsername: boolean }) {
-  const [setupOpen, setSetupOpen] = useState(false);
-  const firstRun = needsSetup && setupOpen;
+  // First install has no credentials yet: land directly on the setup form.
+  const firstRun = needsSetup;
   const [company, setCompany] = useState("Mussa Enterprises");
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
@@ -210,7 +210,6 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (needsSetup && !firstRun) { setSetupOpen(true); return; }
     if ((needUser && !username.trim()) || !pw) { toast.error(needUser ? "Username and PIN are required" : "PIN is required"); return; }
     setBusy(true);
     if (forgot) {
@@ -294,7 +293,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
           )}
           {(firstRun || forgot) && <Field label="Recovery Email or Phone"><Input value={recovery} onChange={(e) => setRecovery(e.target.value)} /></Field>}
           <Field label={forgot ? "New PIN" : "PIN"}>
-            <Input type="password" inputMode="numeric" value={pw} onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 8))} />
+            <Input autoFocus={!needUser} type="password" inputMode="numeric" value={pw} onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 8))} />
           </Field>
           {(firstRun || forgot) && (
             <Field label="Confirm PIN">
@@ -302,11 +301,6 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
             </Field>
           )}
           <Button type="submit" className="w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
-          {needsSetup && (
-            <Button type="button" variant="link" className="w-full text-login-foreground" onClick={() => setSetupOpen((v) => !v)}>
-              {firstRun ? "Back to sign in" : "Set Up Your Cash Control"}
-            </Button>
-          )}
           {!needsSetup && (
             <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full">
               {forgot ? "Back to sign in" : "Forgot password?"}
