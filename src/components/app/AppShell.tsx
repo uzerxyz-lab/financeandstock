@@ -200,7 +200,8 @@ function LoginArrow({ className = "" }: { className?: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 112 100" className={`login-arrow ${className}`}>
       <path className="login-arrow-main" d="M12 10 L62 50 L12 90 Z" fill="currentColor" />
-      <path className="login-arrow-trail" d="M55 14 L100 50 L55 86" fill="none" stroke="currentColor" strokeWidth="7" strokeLinejoin="miter" />
+      <path className="login-arrow-trail" d="M55 14 L100 50 L55 86" fill="none" strokeWidth="7" strokeLinejoin="miter" />
+      <path className="login-arrow-trail login-arrow-trail-2" d="M40 22 L78 50 L40 78" fill="none" strokeWidth="7" strokeLinejoin="miter" />
     </svg>
   );
 }
