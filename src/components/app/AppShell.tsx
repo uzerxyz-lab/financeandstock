@@ -197,8 +197,8 @@ function PageBackBar() {
 }
 
 function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: boolean; onDone: () => void; requireUsername: boolean }) {
-  const [setupOpen, setSetupOpen] = useState(false);
-  const firstRun = needsSetup && setupOpen;
+  // First install has no credentials yet: land directly on the setup form.
+  const firstRun = needsSetup;
   const [company, setCompany] = useState("Mussa Enterprises");
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
