@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Restore split desktop login landing and make first-time setup explicitly accessible without accounting changes
 - [x] Correct Purchase Type label, PIN-to-edit transition, previous voucher balance and combined bank/number line
 - [x] Remove automatic update alerts and embed theme-aware app/voucher logos without separate network requests
 - [x] Preserve logo proportions across header/previews/prints and reduce header logo size; trade Remarks, automatic Particulars and Sale Type on vouchers

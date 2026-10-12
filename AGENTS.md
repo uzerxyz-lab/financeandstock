@@ -17,6 +17,7 @@
 - Shared full logos use embedded original PNG data URLs and voucher capture waits for image decoding, eliminating network-dependent branding in headers and exports.
 - All app data is local-first in the browser (src/lib/db.ts, localStorage + undo stack) — the app must work fully offline for a single user.
 - The login gate and app shell live in src/components/app/AppShell.tsx rendered from __root — every route is behind the local login.
+- The login gate initially shows sign-in, with an explicit first-time setup action when local credentials do not exist; split layout starts at tablet/desktop-site widths so mobile Chrome desktop mode retains the chevron.
 - Legacy expense categories remain stored for historical entries but are hidden from the picker until re-added; this preserves old statements while resetting choices.
 - The selected theme belongs to the login gate, not the signed-in shell, so locking cannot reset it.
 - The shared Dialog wrapper pushes a history entry while open so the phone/browser Back key closes it first; AppShell shows Back + Dashboard controls on every non-dashboard page.
