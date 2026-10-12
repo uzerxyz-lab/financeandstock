@@ -196,6 +196,15 @@ function PageBackBar() {
   );
 }
 
+function LoginArrow({ className = "" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 112 100" className={`login-arrow ${className}`}>
+      <path className="login-arrow-main" d="M12 10 L62 50 L12 90 Z" fill="currentColor" />
+      <path className="login-arrow-trail" d="M55 14 L100 50 L55 86" fill="none" stroke="currentColor" strokeWidth="7" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
 function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: boolean; onDone: () => void; requireUsername: boolean }) {
   // First install has no credentials yet: land directly on the setup form.
   const firstRun = needsSetup;
@@ -243,11 +252,11 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
         <div className="login-mobile-vignette absolute inset-0" />
       </div>
       {/* Mobile corner accents */}
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute right-5 top-4 z-10 text-[5rem] font-light leading-none text-login-foreground/50 md:hidden">
-        <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span><span className="login-chev login-chev-3">›</span>
+      <div aria-hidden="true" className="pointer-events-none absolute right-5 top-4 z-10 md:hidden">
+        <LoginArrow className="login-arrow-top" />
       </div>
-      <div aria-hidden="true" className="login-chev-italic pointer-events-none absolute bottom-4 left-5 z-10 text-[2.5rem] font-light leading-none text-login-foreground/50 md:hidden">
-        <span className="login-chev">›</span><span className="login-chev login-chev-2">›</span>
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-4 left-5 z-10 md:hidden">
+        <LoginArrow className="login-arrow-bottom" />
       </div>
       <div className="pointer-events-none absolute bottom-4 right-5 z-10 flex items-center gap-1.5 text-[10px] text-login-foreground/70 md:hidden">
         <span>Developed by</span>
@@ -259,12 +268,13 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
         <img src={loginBg.url} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-login-glass/90 via-login-tint/75 to-login-glass/85" />
         <div className="login-desktop-vignette absolute inset-0" />
+        <div aria-hidden="true" className="login-dot-mesh pointer-events-none absolute inset-0" />
         <div className="relative text-xs uppercase text-login-foreground/70">Mussa Enterprises · Finance Control</div>
         <div className="relative">
           <h2 className="text-3xl font-semibold leading-tight lg:text-4xl xl:text-5xl">
             Control your business<br />and finance your way
-            <span className="ml-1 inline-flex items-baseline text-[0.78em] text-login-foreground/75">
-              …<span className="login-chev ml-1">›</span><span className="login-chev login-chev-2">›</span>
+            <span className="ml-1 inline-flex items-center gap-2 align-middle">
+              …<LoginArrow className="login-arrow-heading" />
             </span>
           </h2>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-login-foreground/80">Run your business with clarity and manage your finances with the help of a built-in AI-enabled voice assistant that handles your cash flow. Make smarter moves, stay in control, and grow on your own terms.</p>
@@ -274,7 +284,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
           <img src={nexumLogo.url} alt="nexum systems" className="h-5 w-auto object-contain" />
         </div>
       </div>
-      <div className="relative flex min-w-0 items-center justify-center px-6 py-24 md:px-4 md:py-8 lg:px-6">
+      <div className="relative flex min-w-0 items-center justify-center px-6 pb-28 pt-48 md:px-4 md:py-8 lg:px-6">
         <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-login-foreground/15 bg-login-glass/40 p-6 text-login-foreground shadow-2xl backdrop-blur-md md:border-login-foreground/10 md:bg-login-glass/65 md:backdrop-blur-xl lg:p-8">
           <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
           <div className="border-t border-login-foreground/10 pt-4">
