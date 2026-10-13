@@ -83,6 +83,31 @@ export interface Production {
   note: string;
   createdAt: string;
   deletedAt?: string | undefined;
+  /* Heat-production extension (all optional so older runs keep working). */
+  shift?: string | undefined;
+  /** Up to 4 sample bar weights; their average × bars = billet output. */
+  samples?: number[] | undefined;
+  /** Estimated total raw material charged into the heat. */
+  inputKg?: number | undefined;
+  slagKg?: number | undefined;
+  wasteKg?: number | undefined;
+  kwh?: number | undefined;
+  directCost?: number | undefined;
+  /** Total heat cost = material (weighted avg) + energy + direct. */
+  cost?: number | undefined;
+  costPerKg?: number | undefined;
+  /** inputKg − (billet + slag + waste). */
+  varianceKg?: number | undefined;
+}
+
+/** Monthly electricity bill; its effective rate (amount ÷ units) prices heat energy. */
+export interface HeatBill {
+  id: string;
+  period: string;
+  amount: number;
+  units: number;
+  createdAt: string;
+  deletedAt?: string | undefined;
 }
 
 export interface Named {
@@ -137,6 +162,7 @@ export interface Data {
   opening?: Opening | undefined;
   materials: Named[];
   production: Production[];
+  bills: HeatBill[];
   log: LogItem[];
   seq: number;
   voucherSeq: number;
@@ -190,6 +216,7 @@ function empty(): Data {
       { id: "mat-billet", name: "Billet" },
     ],
     production: [],
+    bills: [],
     log: [],
     seq: 1,
     voucherSeq: 1,
@@ -217,6 +244,7 @@ export function migrate(d: Data, newId: () => string = uid) {
   d.accountTypes = d.accountTypes ?? [];
   d.loans = d.loans ?? [];
   d.production = d.production ?? [];
+  d.bills = d.bills ?? [];
   let changed = false;
   for (const e of d.entries) {
     if (e.type === "transfer" || !e.method || e.method === "cash" || e.bankId) continue;
@@ -253,7 +281,7 @@ export function loadData() {
     if (raw) {
       const incoming = JSON.parse(raw) as Partial<Data> & { tags?: Named[] };
       const base = empty();
-      data = { ...base, ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? base.materials, production: incoming.production ?? [] } as Data;
+      data = { ...base, ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? base.materials, production: incoming.production ?? [], bills: incoming.bills ?? [] } as Data;
       data.accounts = (incoming.accounts ?? []).map((a) => ({ ...a, type: a.type === "customer" || a.type === "other" ? "buyer" : a.type }));
       data.entries = (incoming.entries ?? []).map((e) => { const { tagId: _legacyTag, ...entry } = e as Entry & { tagId?: string }; return entry; });
       if (migrate(data)) persist();
@@ -711,6 +739,29 @@ export function deleteProduction(id: string) {
   commit((d) => { const p = d.production.find((x) => x.id === id); if (p) p.deletedAt = new Date().toISOString(); });
 }
 export const liveProduction = (d: Data) => d.production.filter((p) => !p.deletedAt);
+
+/* ---------- electricity bills & heat costing ---------- */
+export function addBill(b: Pick<HeatBill, "period" | "amount" | "units">) {
+  const bill: HeatBill = { ...b, id: uid(), createdAt: new Date().toISOString() };
+  commit((d) => { d.bills.push(bill); });
+  return bill;
+}
+export function deleteBill(id: string) {
+  commit((d) => { const b = d.bills.find((x) => x.id === id); if (b) b.deletedAt = new Date().toISOString(); });
+}
+export const liveBills = (d: Data) => d.bills.filter((b) => !b.deletedAt);
+/** Effective unit rate of the latest bill = bill amount ÷ billed units. */
+export function effectiveRate(d: Data) {
+  const latest = [...liveBills(d)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  return latest && latest.units > 0 ? latest.amount / latest.units : 0;
+}
+/** Moving weighted-average cost per kg of a material: opening stock value + purchases. */
+export function materialAvgCost(d: Data, materialId: string) {
+  let qty = 0, val = 0;
+  for (const s of d.opening?.stock ?? []) if (s.materialId === materialId) { qty += s.kg; val += s.value; }
+  for (const e of liveEntries(d)) if (e.type === "purchase" && e.materialId === materialId && e.weightKg && e.rate) { qty += e.weightKg; val += e.weightKg * e.rate; }
+  return qty > 0 ? val / qty : 0;
+}
 /** Stock in kg per material: purchases + produced − sales − consumed in production. */
 export function stockSummary(d: Data) {
   const rows = new Map<string, { purchased: number; sold: number; produced: number; consumed: number }>();
@@ -722,7 +773,7 @@ export function stockSummary(d: Data) {
     if (e.type === "purchase") row(e.materialId).purchased += e.weightKg;
     if (e.type === "sale") row(e.materialId).sold += e.weightKg;
   }
-  for (const p of liveProduction(d)) { row(p.toMaterialId).produced += p.totalKg; row(p.fromMaterialId).consumed += p.totalKg; }
+  for (const p of liveProduction(d)) { row(p.toMaterialId).produced += p.totalKg; row(p.fromMaterialId).consumed += p.inputKg ?? p.totalKg; }
   return [...rows].map(([id, r]) => ({ id, name: d.materials.find((m) => m.id === id)?.name ?? "Unknown", ...r, stock: r.purchased + r.produced - r.sold - r.consumed }));
 }
 
@@ -735,7 +786,7 @@ export function importJSON(text: string) {
   const incoming: Data = parsed.data ?? parsed;
   if (!Array.isArray(incoming.accounts) || !Array.isArray(incoming.entries)) throw new Error("Invalid backup file");
   commit((d) => {
-    Object.assign(d, { ...empty(), ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? empty().materials, production: incoming.production ?? [], auth: d.auth ?? incoming.auth });
+    Object.assign(d, { ...empty(), ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? empty().materials, production: incoming.production ?? [], bills: incoming.bills ?? [], auth: d.auth ?? incoming.auth });
     migrate(d);
   });
 }
