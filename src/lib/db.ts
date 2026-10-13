@@ -739,6 +739,29 @@ export function deleteProduction(id: string) {
   commit((d) => { const p = d.production.find((x) => x.id === id); if (p) p.deletedAt = new Date().toISOString(); });
 }
 export const liveProduction = (d: Data) => d.production.filter((p) => !p.deletedAt);
+
+/* ---------- electricity bills & heat costing ---------- */
+export function addBill(b: Pick<HeatBill, "period" | "amount" | "units">) {
+  const bill: HeatBill = { ...b, id: uid(), createdAt: new Date().toISOString() };
+  commit((d) => { d.bills.push(bill); });
+  return bill;
+}
+export function deleteBill(id: string) {
+  commit((d) => { const b = d.bills.find((x) => x.id === id); if (b) b.deletedAt = new Date().toISOString(); });
+}
+export const liveBills = (d: Data) => d.bills.filter((b) => !b.deletedAt);
+/** Effective unit rate of the latest bill = bill amount ÷ billed units. */
+export function effectiveRate(d: Data) {
+  const latest = [...liveBills(d)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  return latest && latest.units > 0 ? latest.amount / latest.units : 0;
+}
+/** Moving weighted-average cost per kg of a material: opening stock value + purchases. */
+export function materialAvgCost(d: Data, materialId: string) {
+  let qty = 0, val = 0;
+  for (const s of d.opening?.stock ?? []) if (s.materialId === materialId) { qty += s.kg; val += s.value; }
+  for (const e of liveEntries(d)) if (e.type === "purchase" && e.materialId === materialId && e.weightKg && e.rate) { qty += e.weightKg; val += e.weightKg * e.rate; }
+  return qty > 0 ? val / qty : 0;
+}
 /** Stock in kg per material: purchases + produced − sales − consumed in production. */
 export function stockSummary(d: Data) {
   const rows = new Map<string, { purchased: number; sold: number; produced: number; consumed: number }>();
@@ -750,7 +773,7 @@ export function stockSummary(d: Data) {
     if (e.type === "purchase") row(e.materialId).purchased += e.weightKg;
     if (e.type === "sale") row(e.materialId).sold += e.weightKg;
   }
-  for (const p of liveProduction(d)) { row(p.toMaterialId).produced += p.totalKg; row(p.fromMaterialId).consumed += p.totalKg; }
+  for (const p of liveProduction(d)) { row(p.toMaterialId).produced += p.totalKg; row(p.fromMaterialId).consumed += p.inputKg ?? p.totalKg; }
   return [...rows].map(([id, r]) => ({ id, name: d.materials.find((m) => m.id === id)?.name ?? "Unknown", ...r, stock: r.purchased + r.produced - r.sold - r.consumed }));
 }
 
@@ -763,7 +786,7 @@ export function importJSON(text: string) {
   const incoming: Data = parsed.data ?? parsed;
   if (!Array.isArray(incoming.accounts) || !Array.isArray(incoming.entries)) throw new Error("Invalid backup file");
   commit((d) => {
-    Object.assign(d, { ...empty(), ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? empty().materials, production: incoming.production ?? [], auth: d.auth ?? incoming.auth });
+    Object.assign(d, { ...empty(), ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? empty().materials, production: incoming.production ?? [], bills: incoming.bills ?? [], auth: d.auth ?? incoming.auth });
     migrate(d);
   });
 }
