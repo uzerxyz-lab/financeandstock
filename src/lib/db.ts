@@ -83,6 +83,31 @@ export interface Production {
   note: string;
   createdAt: string;
   deletedAt?: string | undefined;
+  /* Heat-production extension (all optional so older runs keep working). */
+  shift?: string | undefined;
+  /** Up to 4 sample bar weights; their average × bars = billet output. */
+  samples?: number[] | undefined;
+  /** Estimated total raw material charged into the heat. */
+  inputKg?: number | undefined;
+  slagKg?: number | undefined;
+  wasteKg?: number | undefined;
+  kwh?: number | undefined;
+  directCost?: number | undefined;
+  /** Total heat cost = material (weighted avg) + energy + direct. */
+  cost?: number | undefined;
+  costPerKg?: number | undefined;
+  /** inputKg − (billet + slag + waste). */
+  varianceKg?: number | undefined;
+}
+
+/** Monthly electricity bill; its effective rate (amount ÷ units) prices heat energy. */
+export interface HeatBill {
+  id: string;
+  period: string;
+  amount: number;
+  units: number;
+  createdAt: string;
+  deletedAt?: string | undefined;
 }
 
 export interface Named {
@@ -137,6 +162,7 @@ export interface Data {
   opening?: Opening | undefined;
   materials: Named[];
   production: Production[];
+  bills: HeatBill[];
   log: LogItem[];
   seq: number;
   voucherSeq: number;
@@ -190,6 +216,7 @@ function empty(): Data {
       { id: "mat-billet", name: "Billet" },
     ],
     production: [],
+    bills: [],
     log: [],
     seq: 1,
     voucherSeq: 1,
@@ -217,6 +244,7 @@ export function migrate(d: Data, newId: () => string = uid) {
   d.accountTypes = d.accountTypes ?? [];
   d.loans = d.loans ?? [];
   d.production = d.production ?? [];
+  d.bills = d.bills ?? [];
   let changed = false;
   for (const e of d.entries) {
     if (e.type === "transfer" || !e.method || e.method === "cash" || e.bankId) continue;
@@ -253,7 +281,7 @@ export function loadData() {
     if (raw) {
       const incoming = JSON.parse(raw) as Partial<Data> & { tags?: Named[] };
       const base = empty();
-      data = { ...base, ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? base.materials, production: incoming.production ?? [] } as Data;
+      data = { ...base, ...incoming, accountTypes: incoming.accountTypes ?? [], loans: incoming.loans ?? [], materials: incoming.materials ?? base.materials, production: incoming.production ?? [], bills: incoming.bills ?? [] } as Data;
       data.accounts = (incoming.accounts ?? []).map((a) => ({ ...a, type: a.type === "customer" || a.type === "other" ? "buyer" : a.type }));
       data.entries = (incoming.entries ?? []).map((e) => { const { tagId: _legacyTag, ...entry } = e as Entry & { tagId?: string }; return entry; });
       if (migrate(data)) persist();
