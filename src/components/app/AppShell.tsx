@@ -117,70 +117,124 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
   const navigate = useNavigate();
   const router = useRouter();
   const pathname = useLocation({ select: (l) => l.pathname });
+  const pageLabel = NAV.find((n) => (n.to === "/" ? pathname === "/" : pathname.startsWith(n.to)))?.label ?? "Dashboard";
+  const searchBox = (
+    <div className="flex w-full items-center gap-2 rounded-full border bg-background px-4 py-1">
+      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <AccountSearch
+        id="global-search"
+        clearOnSelect
+        className="w-full [&_input]:border-0 [&_input]:bg-transparent [&_input]:shadow-none [&_input]:focus-visible:ring-0"
+        placeholder="Search accounts…  (Ctrl+F)"
+        onSelect={(a) => navigate({ to: "/ledger/$id", params: { id: a.id } })}
+      />
+    </div>
+  );
+  const navItems = (onNavigate?: () => void) =>
+    NAV.map((n) => (
+      <Link
+        key={n.to}
+        to={n.to}
+        onClick={onNavigate}
+        activeOptions={{ exact: n.to === "/" }}
+        className="nav-magnify flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        activeProps={{ className: "bg-sidebar-accent font-medium text-sidebar-accent-foreground" }}
+      >
+        <n.icon className="h-4 w-4 shrink-0" /> {n.label}
+      </Link>
+    ));
   return (
-    <div className="min-h-screen bg-background">
-      <div className="no-print sticky top-0 z-30">
-      <header className="bg-card">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 pt-3 sm:px-6">
-          <div className="flex min-w-0 items-center gap-2">
-            <Sheet>
-              <SheetTrigger asChild>
-                <button aria-label="Menu" className="shrink-0 p-1.5 text-foreground"><Menu className="h-5 w-5" /></button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0">
-                <SheetHeader className="border-b p-4"><SheetTitle><Logo className="h-auto w-44" /></SheetTitle></SheetHeader>
-                <div className="space-y-1 p-3">
-                  <SheetClose asChild>
-                    <button onClick={() => router.history.back()} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-surface"><ArrowLeft className="h-4 w-4" /> Back</button>
-                  </SheetClose>
-                  <div className="my-2 border-t" />
-                  {NAV.map((n) => (
-                    <SheetClose asChild key={n.to}>
-                      <Link to={n.to} activeOptions={{ exact: n.to === "/" }} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-surface" activeProps={{ className: "bg-accent font-medium text-accent-foreground" }}>
-                        <n.icon className="h-4 w-4" /> {n.label}
-                      </Link>
-                    </SheetClose>
-                  ))}
-                  <div className="my-2 border-t" />
-                   <Button variant="ghost" onClick={onToggleTheme} className="w-full justify-start gap-3 px-3">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Day mode" : "Night mode"}</Button>
-                  <SheetClose asChild>
-                    <button onClick={() => checkForUpdate(true)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-surface"><RefreshCw className="h-4 w-4" /> Check for updates</button>
-                  </SheetClose>
-                  <button onClick={() => onLogout(true)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-surface"><LogOut className="h-4 w-4" /> Log out</button>
-                </div>
-              </SheetContent>
-            </Sheet>
-            <Link to="/" className="min-w-0"><Logo className="h-auto w-36 sm:w-44" /></Link>
+    <div className="min-h-screen bg-background md:flex">
+      {/* Desktop sidebar (reference layout) */}
+      <aside className="no-print sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
+        <div className="px-5 pb-5 pt-6">
+          <Link to="/"><img src={whiteLogo} alt="Mussa Enterprises" className="h-auto w-40 object-contain" /></Link>
+        </div>
+        <div className="px-6 pb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/50">Workspace</div>
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3">{navItems()}</nav>
+        <div className="space-y-3 border-t border-sidebar-border p-4 text-xs text-sidebar-foreground/70">
+          <div className="inline-flex items-center gap-2 rounded-full bg-sidebar-accent px-3 py-1.5 text-sidebar-accent-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-metric-cash" /> Offline-ready
           </div>
           <div className="flex items-center gap-1">
-            <SyncButton />
-            <button onClick={() => onLogout()} aria-label="Lock app" title="Lock app" className="p-2 text-muted-foreground hover:text-foreground"><Lock className="h-5 w-5" /></button>
-             <Button variant="ghost" size="icon" onClick={onToggleTheme} aria-label="Toggle theme" title="Toggle theme" className="text-muted-foreground hover:text-foreground">{dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</Button>
+            <button onClick={onToggleTheme} aria-label="Toggle theme" title="Toggle theme" className="rounded-lg p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</button>
+            <button onClick={() => onLogout()} aria-label="Lock app" title="Lock app" className="rounded-lg p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"><Lock className="h-4 w-4" /></button>
+            <button onClick={() => onLogout(true)} aria-label="Log out" title="Log out" className="rounded-lg p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"><LogOut className="h-4 w-4" /></button>
           </div>
         </div>
-          {pathname === "/" && (
-            <div className="pl-[60px] pr-4 pb-1 pt-1 sm:pl-[68px]">
-              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Finance Control Dashboard</h1>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="no-print sticky top-0 z-30 border-b bg-card">
+          <header className="flex items-center justify-between gap-2 px-4 py-2.5 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button aria-label="Menu" className="shrink-0 p-1.5 text-foreground md:hidden"><Menu className="h-5 w-5" /></button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-72 bg-sidebar p-0 text-sidebar-foreground">
+                  <SheetHeader className="border-b border-sidebar-border p-4"><SheetTitle><img src={whiteLogo} alt="Mussa Enterprises" className="h-auto w-40 object-contain" /></SheetTitle></SheetHeader>
+                  <div className="space-y-1 p-3">
+                    <SheetClose asChild>
+                      <button onClick={() => router.history.back()} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent"><ArrowLeft className="h-4 w-4" /> Back</button>
+                    </SheetClose>
+                    <div className="my-2 border-t border-sidebar-border" />
+                    {NAV.map((n) => (
+                      <SheetClose asChild key={n.to}>
+                        <Link to={n.to} activeOptions={{ exact: n.to === "/" }} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent" activeProps={{ className: "bg-sidebar-accent font-medium text-sidebar-accent-foreground" }}>
+                          <n.icon className="h-4 w-4" /> {n.label}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                    <div className="my-2 border-t border-sidebar-border" />
+                    <button onClick={onToggleTheme} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Day mode" : "Night mode"}</button>
+                    <SheetClose asChild>
+                      <button onClick={() => checkForUpdate(true)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent"><RefreshCw className="h-4 w-4" /> Check for updates</button>
+                    </SheetClose>
+                    <button onClick={() => onLogout(true)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-sidebar-accent"><LogOut className="h-4 w-4" /> Log out</button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Link to="/" className="min-w-0 md:hidden"><Logo className="h-auto w-32" /></Link>
+              <div className="hidden text-xs text-muted-foreground md:block">
+                {data.company.name || "Mussa Enterprises"} <span className="mx-1 text-border">/</span> <span className="font-medium text-foreground">{pageLabel}</span>
+              </div>
             </div>
-          )}
-        </header>
-        <div className="border-b bg-card">
-          <div className="mx-auto flex w-full max-w-xl items-center gap-2 px-4 py-2 sm:px-6"><div className="flex w-full items-center gap-2 rounded-full border bg-background px-4 py-1">
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <AccountSearch
-              id="global-search"
-              clearOnSelect
-              className="w-full [&_input]:border-0 [&_input]:bg-transparent [&_input]:shadow-none [&_input]:focus-visible:ring-0"
-              placeholder="Search accounts…  (Ctrl+F)"
-              onSelect={(a) => navigate({ to: "/ledger/$id", params: { id: a.id } })}
-            />
-          </div></div>
+            <div className="hidden w-full max-w-sm md:block">{searchBox}</div>
+            <div className="flex items-center gap-1">
+              <SyncButton />
+              <button onClick={() => onLogout()} aria-label="Lock app" title="Lock app" className="p-2 text-muted-foreground hover:text-foreground md:hidden"><Lock className="h-5 w-5" /></button>
+              <Button variant="ghost" size="icon" onClick={onToggleTheme} aria-label="Toggle theme" title="Toggle theme" className="text-muted-foreground hover:text-foreground md:hidden">{dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</Button>
+            </div>
+          </header>
+          <div className="px-4 pb-2 md:hidden">{searchBox}</div>
         </div>
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-24 sm:p-6 md:pb-6">
+          <PageBackBar />
+          <Outlet />
+        </main>
       </div>
-      <main className="mx-auto w-full max-w-7xl p-4 sm:p-6">
-        <PageBackBar />
-        <Outlet />
-      </main>
+
+      {/* Mobile bottom navigation (reference layout) */}
+      <nav className="no-print fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
+        {[
+          { to: "/", label: "Home", icon: LayoutDashboard },
+          { to: "/sales", label: "Sales", icon: BadgeDollarSign },
+          { to: "/purchases", label: "Purchases", icon: ShoppingCart },
+          { to: "/production", label: "Heats", icon: Flame },
+          { to: "/accounts", label: "Accounts", icon: Users },
+        ].map((n) => (
+          <Link
+            key={n.to}
+            to={n.to}
+            activeOptions={{ exact: n.to === "/" }}
+            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-muted-foreground"
+            activeProps={{ className: "text-primary font-semibold" }}
+          >
+            <n.icon className="h-5 w-5" /> {n.label}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
