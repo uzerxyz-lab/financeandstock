@@ -160,14 +160,14 @@
   --chart-3: oklch(0.47 0.085 205);
   --chart-4: oklch(0.62 0.13 70);
   --chart-5: oklch(0.5 0.03 257);
-  --sidebar: oklch(0.22 0.03 257);
-  --sidebar-foreground: oklch(0.86 0.012 250);
-  --sidebar-primary: oklch(0.72 0.1 195);
-  --sidebar-primary-foreground: oklch(0.2 0.03 257);
-  --sidebar-accent: oklch(0.28 0.035 257);
-  --sidebar-accent-foreground: oklch(0.98 0.004 250);
-  --sidebar-border: oklch(0.3 0.03 257);
-  --sidebar-ring: oklch(0.72 0.1 195);
+  --sidebar: oklch(0.32 0.005 260);
+  --sidebar-foreground: oklch(0.87 0.003 260);
+  --sidebar-primary: oklch(0.95 0.003 247);
+  --sidebar-primary-foreground: oklch(0.32 0.005 260);
+  --sidebar-accent: oklch(0.4 0.005 260);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(0.44 0.005 260);
+  --sidebar-ring: oklch(0.87 0.003 260);
   --inflow: oklch(0.58 0.07 165);
   --outflow: oklch(0.61 0.12 18);
   --ledger: oklch(0.47 0.1 258);
@@ -237,7 +237,22 @@
   --entry-card-soft: oklch(0.28 0.04 215);
   --admin-card: oklch(0.69 0.12 350);
   --admin-card-soft: oklch(0.27 0.045 350);
+  --metric-cash: oklch(0.68 0.12 152);
+  --metric-cash-soft: oklch(0.28 0.04 152);
+  --metric-bank: oklch(0.68 0.09 230);
+  --metric-bank-soft: oklch(0.28 0.03 230);
+  --metric-receivable: oklch(0.72 0.12 60);
+  --metric-receivable-soft: oklch(0.29 0.04 60);
+  --metric-payable: oklch(0.66 0.14 22);
+  --metric-payable-soft: oklch(0.28 0.04 22);
 }
+
+/* Native date/calendar controls follow the theme instead of staying black in dark mode. */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+
+/* Warning strips keep readable text in both themes. */
+.dark [class*="bg-warning/"] { color: oklch(0.92 0.08 90); }
 
 /* Solid on phones (blur on many tiles causes lag); light blur on larger screens only. */
 @utility glass {
@@ -262,6 +277,36 @@
 @layer base {
   html { font-family: var(--font-sans); }
   .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+}
+
+/* Gentle lift on interactive cards / dashboard items (reference-style micro bounce). */
+@utility card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px oklch(0.3 0.02 200 / 0.12);
+    }
+  }
+  &:active {
+    transform: translateY(1px) scale(0.995);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover { transform: none; }
+  }
+}
+
+/* Sidebar nav items magnify slightly under the cursor. */
+@utility nav-magnify {
+  transition: transform 0.14s ease, background-color 0.14s ease, color 0.14s ease;
+  @media (hover: hover) {
+    &:hover { transform: scale(1.04); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover { transform: none; }
+  }
 }
 
 .print-only { display: none; }
