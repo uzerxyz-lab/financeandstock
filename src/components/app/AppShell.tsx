@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate, useRouter } from "@tanstack/rea
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import {
-  LayoutDashboard, ListOrdered, Users, BookOpen, Receipt, Wallet, ShieldCheck, Settings, LogOut, Search, Menu, ArrowLeft, Lock, Moon, Sun, ShoppingCart, BadgeDollarSign, HandCoins, RefreshCw, CloudUpload,
+  LayoutDashboard, ListOrdered, Users, BookOpen, Receipt, Wallet, ShieldCheck, Settings, LogOut, Search, Menu, ArrowLeft, Lock, Moon, Sun, ShoppingCart, BadgeDollarSign, HandCoins, RefreshCw, CloudUpload, Flame, Zap, Boxes,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,9 @@ const NAV = [
   { to: "/loans", label: "Personal Loans", icon: HandCoins },
   { to: "/cashbook", label: "Cash Book", icon: Wallet },
   { to: "/banks", label: "Cash & Banks", icon: Wallet },
+  { to: "/stock", label: "Stock", icon: Boxes },
+  { to: "/production", label: "Heat Production", icon: Flame },
+  { to: "/electricity", label: "Electricity", icon: Zap },
   { to: "/opening", label: "Opening Balances", icon: BookOpen },
   { to: "/expenses", label: "Expenses", icon: Receipt },
   { to: "/reports", label: "Reports", icon: BookOpen },
