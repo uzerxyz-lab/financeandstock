@@ -14,10 +14,12 @@ import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BanksRouteImport } from './routes/banks'
 import { Route as CashbookRouteImport } from './routes/cashbook'
+import { Route as ElectricityRouteImport } from './routes/electricity'
 import { Route as EntriesRouteImport } from './routes/entries'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as LoansRouteImport } from './routes/loans'
 import { Route as OpeningRouteImport } from './routes/opening'
+import { Route as ProductionRouteImport } from './routes/production'
 import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as SalesRouteImport } from './routes/sales'
@@ -54,6 +56,11 @@ const CashbookRoute = CashbookRouteImport.update({
   path: '/cashbook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ElectricityRoute = ElectricityRouteImport.update({
+  id: '/electricity',
+  path: '/electricity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EntriesRoute = EntriesRouteImport.update({
   id: '/entries',
   path: '/entries',
@@ -72,6 +79,11 @@ const LoansRoute = LoansRouteImport.update({
 const OpeningRoute = OpeningRouteImport.update({
   id: '/opening',
   path: '/opening',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductionRoute = ProductionRouteImport.update({
+  id: '/production',
+  path: '/production',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PurchasesRoute = PurchasesRouteImport.update({
@@ -131,10 +143,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
+  '/electricity': typeof ElectricityRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
   '/opening': typeof OpeningRoute
+  '/production': typeof ProductionRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -152,10 +166,12 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
+  '/electricity': typeof ElectricityRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
   '/opening': typeof OpeningRoute
+  '/production': typeof ProductionRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -174,10 +190,12 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/banks': typeof BanksRoute
   '/cashbook': typeof CashbookRoute
+  '/electricity': typeof ElectricityRoute
   '/entries': typeof EntriesRoute
   '/expenses': typeof ExpensesRoute
   '/loans': typeof LoansRoute
   '/opening': typeof OpeningRoute
+  '/production': typeof ProductionRoute
   '/purchases': typeof PurchasesRoute
   '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
@@ -197,10 +215,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/banks'
     | '/cashbook'
+    | '/electricity'
     | '/entries'
     | '/expenses'
     | '/loans'
     | '/opening'
+    | '/production'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -218,10 +238,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/banks'
     | '/cashbook'
+    | '/electricity'
     | '/entries'
     | '/expenses'
     | '/loans'
     | '/opening'
+    | '/production'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -239,10 +261,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/banks'
     | '/cashbook'
+    | '/electricity'
     | '/entries'
     | '/expenses'
     | '/loans'
     | '/opening'
+    | '/production'
     | '/purchases'
     | '/reports'
     | '/sales'
@@ -261,10 +285,12 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   BanksRoute: typeof BanksRoute
   CashbookRoute: typeof CashbookRoute
+  ElectricityRoute: typeof ElectricityRoute
   EntriesRoute: typeof EntriesRoute
   ExpensesRoute: typeof ExpensesRoute
   LoansRoute: typeof LoansRoute
   OpeningRoute: typeof OpeningRoute
+  ProductionRoute: typeof ProductionRoute
   PurchasesRoute: typeof PurchasesRoute
   ReportsRoute: typeof ReportsRoute
   SalesRoute: typeof SalesRoute
@@ -314,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CashbookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/electricity': {
+      id: '/electricity'
+      path: '/electricity'
+      fullPath: '/electricity'
+      preLoaderRoute: typeof ElectricityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entries': {
       id: '/entries'
       path: '/entries'
@@ -340,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/opening'
       fullPath: '/opening'
       preLoaderRoute: typeof OpeningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/production': {
+      id: '/production'
+      path: '/production'
+      fullPath: '/production'
+      preLoaderRoute: typeof ProductionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purchases': {
@@ -421,10 +461,12 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   BanksRoute: BanksRoute,
   CashbookRoute: CashbookRoute,
+  ElectricityRoute: ElectricityRoute,
   EntriesRoute: EntriesRoute,
   ExpensesRoute: ExpensesRoute,
   LoansRoute: LoansRoute,
   OpeningRoute: OpeningRoute,
+  ProductionRoute: ProductionRoute,
   PurchasesRoute: PurchasesRoute,
   ReportsRoute: ReportsRoute,
   SalesRoute: SalesRoute,

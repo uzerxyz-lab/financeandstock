@@ -91,3 +91,37 @@ describe("opening capital", () => {
     expect(fundBalance(getData(), CASH)).toBe(100000);
   });
 });
+
+describe("heat production costing", () => {
+  it("computes billet output, variance and cost per kg from samples, energy rate and material average", () => {
+    const { addProduction, addBill, effectiveRate, materialAvgCost, stockSummary } = db;
+    const d0 = getData();
+    const scrap = d0.materials.find((m) => m.name === "Scrap")!;
+    const billet = d0.materials.find((m) => m.name === "Billet")!;
+    // 5,367 kg @ 148 => weighted average 148
+    addEntry({ type: "purchase", date: "2026-10-02", amount: 794316, particulars: "Scrap", payMode: "credit", materialId: scrap.id, weightKg: 5367, rate: 148 });
+    expect(materialAvgCost(getData(), scrap.id)).toBeCloseTo(148, 6);
+    // bill: 2,784,000 / 12,400 units = 224.61.../unit
+    addBill({ period: "Oct 2026", amount: 2784000, units: 12400 });
+    const rate = effectiveRate(getData());
+    expect(rate).toBeCloseTo(2784000 / 12400, 6);
+    // heat: samples avg 21.4 × 200 bars = 4,280 kg billet; input 4,600; slag 240; waste 80
+    const avgBar = (21.3 + 21.5 + 21.4 + 21.4) / 4;
+    const out = avgBar * 200;
+    expect(out).toBeCloseTo(4280, 6);
+    const input = 4600, kwh = 610;
+    const cost = input * 148 + kwh * rate;
+    addProduction({
+      date: "2026-10-10", fromMaterialId: scrap.id, toMaterialId: billet.id,
+      bars: 200, barWeightKg: avgBar, totalKg: out, note: "",
+      shift: "Day", samples: [21.3, 21.5, 21.4, 21.4], inputKg: input, slagKg: 240, wasteKg: 80, kwh,
+      cost: Math.round(cost), costPerKg: Math.round((cost / out) * 100) / 100, varianceKg: input - (out + 240 + 80),
+    });
+    const s = stockSummary(getData());
+    expect(s.find((r) => r.id === scrap.id)!.stock).toBeCloseTo(5367 - 4600, 6);
+    expect(s.find((r) => r.id === billet.id)!.stock).toBeCloseTo(4280, 6);
+    const heat = getData().production[0]!;
+    expect(heat.varianceKg).toBeCloseTo(0, 6);
+    expect(heat.costPerKg).toBeCloseTo(Math.round((cost / 4280) * 100) / 100, 6);
+  });
+});
