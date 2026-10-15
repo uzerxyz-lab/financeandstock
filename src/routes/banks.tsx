@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, NativeSelect, PageHeader } from "@/components/app/inputs";
+import { BankNameInput } from "@/components/app/BankNameInput";
 import { CASH, addBank, addCapital, addTransfer, fundList, useData } from "@/lib/db";
 import { fmtPKR, todayISO } from "@/lib/format";
 
@@ -77,7 +78,7 @@ function BanksPage() {
           <DialogHeader><DialogTitle>{dialog === "bank" ? "New Bank Account" : dialog === "capital" ? "Capital Introduced" : "Internal Transfer"}</DialogTitle></DialogHeader>
           <div className="grid gap-3">
             {dialog === "bank" ? <>
-              <Field label="Bank name *"><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Meezan Bank" /></Field>
+              <Field label="Bank name *"><BankNameInput value={name} onChange={setName} placeholder="e.g. Meezan Bank" /></Field>
               <Field label="Account no. (optional)"><Input value={accNo} onChange={(e) => setAccNo(e.target.value)} /></Field>
               <Field label="Opening balance (Rs)"><Input className="num text-right" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
             </> : <>

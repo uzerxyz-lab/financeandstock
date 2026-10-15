@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, NativeSelect, PageHeader } from "@/components/app/inputs";
+import { BankNameInput } from "@/components/app/BankNameInput";
 import { accountTypeLabel, liveAccounts, liveBanks, openingCapital, saveOpening, useData, type Data, type OpeningItem } from "@/lib/db";
 import { fmtPKR, todayISO } from "@/lib/format";
 
@@ -83,7 +84,7 @@ function OpeningPage() {
         <div className="grid gap-2">
           {banks.map((b, i) => (
             <div key={i} className="grid grid-cols-[1fr_1fr_8rem] gap-2">
-              <Input placeholder="Bank name" value={b.name} onChange={(e) => setBanks(banks.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
+              <BankNameInput value={b.name} onChange={(v) => setBanks(banks.map((x, j) => j === i ? { ...x, name: v } : x))} />
               <Input placeholder="Account no." value={b.accountNo} onChange={(e) => setBanks(banks.map((x, j) => j === i ? { ...x, accountNo: e.target.value } : x))} />
               <Input className="num text-right" placeholder="Balance" value={b.amount} onChange={(e) => setBanks(banks.map((x, j) => j === i ? { ...x, amount: e.target.value } : x))} />
             </div>
