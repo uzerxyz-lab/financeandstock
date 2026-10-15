@@ -374,3 +374,7 @@
 .login-mobile-vignette { background: radial-gradient(ellipse at center, transparent 35%, color-mix(in oklab, var(--login-vignette) 55%, transparent) 100%); }
 .login-desktop-vignette { background: radial-gradient(ellipse at center, transparent 30%, color-mix(in oklab, var(--login-vignette) 70%, transparent) 100%); }
 @media (prefers-reduced-motion: reduce) { .login-arrow-trail, .login-arrow-main { animation: none; } }
+
+/* Dashboard widgets: width follows saved size, capped by available columns. */
+.widget { grid-column: span min(var(--w, 1), 2); }
+@media (min-width: 768px) { .widget { grid-column: span min(var(--w, 1), 4); } }
