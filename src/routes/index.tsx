@@ -342,6 +342,24 @@ function Dashboard() {
           {newAcc && <AccountForm onSaved={() => setNewAcc(false)} />}
         </DialogContent>
       </Dialog>
+      <Sheet open={drawer} onOpenChange={(o) => dashboard.setDrawer(o)}>
+        <SheetContent side="right" className="w-80 overflow-y-auto">
+          <SheetHeader><SheetTitle>Dashboard cards</SheetTitle></SheetHeader>
+          <p className="mt-1 text-xs text-muted-foreground">Turn cards on or off. Use Edit layout to move and resize them.</p>
+          <div className="mt-4 space-y-1">
+            {ALL_WIDGETS.map((id) => {
+              const on = layout.some((x) => x.id === id);
+              return (
+                <label key={id} className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-muted">
+                  <span>{WIDGET_LABELS[id]}</span>
+                  <Switch checked={on} onCheckedChange={(v) => { haptic(8); dashboard.toggle(id, v); }} />
+                </label>
+              );
+            })}
+          </div>
+          <button onClick={() => dashboard.reset()} className="mt-4 flex w-full items-center justify-center gap-1 rounded-lg border px-3 py-2 text-xs font-semibold"><RotateCcw className="h-3.5 w-3.5" /> Reset to default</button>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
