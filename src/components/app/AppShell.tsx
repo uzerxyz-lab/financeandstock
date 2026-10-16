@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/entries", label: "All Entries", icon: ListOrdered },
+  { to: "/vouchers", label: "Vouchers", icon: FileText },
   { to: "/accounts", label: "Accounts", icon: Users },
   { to: "/sales", label: "Sales", icon: BadgeDollarSign },
   { to: "/purchases", label: "Purchases", icon: ShoppingCart },
