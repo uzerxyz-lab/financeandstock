@@ -37,7 +37,7 @@ const NAV = [
   { to: "/reports", label: "Reports", icon: BookOpen },
   { to: "/admin", label: "Admin Panel", icon: ShieldCheck },
   { to: "/settings", label: "Settings & Backup", icon: Settings },
-] as const;
+];
 
 const SESSION = "cashbook-session";
 const LOGGED_OUT = "cashbook-logged-out";
