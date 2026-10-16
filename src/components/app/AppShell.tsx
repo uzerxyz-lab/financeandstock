@@ -216,22 +216,22 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
       </div>
 
       {/* Mobile bottom navigation (reference layout) */}
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav aria-label="Main navigation" className="mobile-nav no-print fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around rounded-t-2xl px-1 pb-[env(safe-area-inset-bottom)] md:hidden">
         {[
           { to: "/", label: "Home", icon: LayoutDashboard },
           { to: "/sales", label: "Sales", icon: BadgeDollarSign },
           { to: "/purchases", label: "Purchases", icon: ShoppingCart },
-          { to: "/production", label: "Heats", icon: Flame },
+          { to: "/vouchers", label: "Vouchers", icon: FileText },
           { to: "/accounts", label: "Accounts", icon: Users },
         ].map((n) => (
           <Link
             key={n.to}
             to={n.to}
             activeOptions={{ exact: n.to === "/" }}
-            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] text-muted-foreground"
-            activeProps={{ className: "text-primary font-semibold" }}
+            className="flex flex-1 flex-col items-center gap-0.5 pb-1.5 pt-1.5 text-[11px] font-medium"
+            activeProps={{ className: "active-tab font-semibold" }}
           >
-            <n.icon className="h-5 w-5" /> {n.label}
+            <span className="nav-ic"><n.icon className="h-[22px] w-[22px]" strokeWidth={2.2} /></span> {n.label}
           </Link>
         ))}
       </nav>
