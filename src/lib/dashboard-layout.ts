@@ -2,19 +2,19 @@ import { useSyncExternalStore } from "react";
 
 /** Dashboard widget layout: order + size per widget, persisted per device. */
 export type WidgetId =
-  | "cash" | "bank" | "receivable" | "payable" | "advances" | "stock" | "quick" | "activity" | "heats"
+  | "treasury" | "cash" | "bank" | "receivable" | "payable" | "advances" | "stock" | "quick" | "activity" | "heats"
   | "vouchers" | "accounts" | "sales" | "purchases" | "cashbook" | "workers" | "loans" | "expenses" | "reports" | "electricity" | "monthly";
 export type WidgetLayout = { id: WidgetId; w: number; h: number };
 
 export const WIDGET_LABELS: Record<WidgetId, string> = {
-  cash: "Cash in hand", bank: "Bank balance", receivable: "Receivables", payable: "Payables", advances: "Advances",
+  treasury: "Treasury Position", cash: "Cash in hand", bank: "Bank balance", receivable: "Receivables", payable: "Payables", advances: "Advances",
   stock: "Raw material stock", quick: "Quick actions", activity: "Recent activity", heats: "Production heats",
   vouchers: "Vouchers", accounts: "Accounts / Ledgers", sales: "Sales", purchases: "Purchases", cashbook: "Cash Book",
   workers: "Workers", loans: "Personal Loans", expenses: "Expenses", reports: "Reports", electricity: "Electricity", monthly: "This month",
 };
 
 export const DEFAULT_LAYOUT: WidgetLayout[] = [
-  { id: "cash", w: 1, h: 1 }, { id: "bank", w: 1, h: 1 }, { id: "receivable", w: 1, h: 1 }, { id: "payable", w: 1, h: 1 },
+  { id: "treasury", w: 4, h: 2 },
   { id: "stock", w: 2, h: 2 }, { id: "quick", w: 2, h: 2 },
   { id: "vouchers", w: 1, h: 1 }, { id: "advances", w: 1, h: 1 }, { id: "monthly", w: 2, h: 1 },
   { id: "heats", w: 4, h: 2 },
@@ -37,6 +37,14 @@ function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "null");
     if (Array.isArray(raw)) state = { ...state, layout: raw.filter((x) => ALL_WIDGETS.includes(x?.id)).map((x) => ({ id: x.id, w: clamp(x.w, 1, MAX_W), h: clamp(x.h, 1, MAX_H) })) };
+    // One-time: add the Treasury Position card to layouts saved before it existed.
+    if (!localStorage.getItem(KEY + "-treasury")) {
+      localStorage.setItem(KEY + "-treasury", "1");
+      if (!state.layout.some((x) => x.id === "treasury")) {
+        state = { ...state, layout: [{ id: "treasury", w: 4, h: 2 }, ...state.layout.filter((x) => !["cash", "bank", "receivable", "payable"].includes(x.id))] };
+        localStorage.setItem(KEY, JSON.stringify(state.layout));
+      }
+    }
   } catch { /* keep default */ }
 }
 function clamp(n: unknown, lo: number, hi: number) { const v = Math.round(Number(n) || lo); return Math.min(hi, Math.max(lo, v)); }

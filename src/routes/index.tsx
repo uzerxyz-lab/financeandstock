@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  ArrowDownLeft, ArrowUpRight, Banknote, BarChart3, BookOpen, Boxes, Check, Eye, EyeOff, Flame, GripVertical, HandCoins, LayoutGrid, Landmark,
+  ArrowDownLeft, ArrowUpRight, Banknote, BarChart3, BookOpen, Boxes, Check, Flame, GripVertical, HandCoins, LayoutGrid, Landmark,
   ListOrdered, Maximize2, Pencil, Plus, Receipt, RotateCcw, ShoppingCart, BadgeDollarSign, Users, Wallet, Zap, FileText,
 } from "lucide-react";
 import { EntryForm } from "@/components/app/EntryForm";
+import { TreasuryCard } from "@/components/app/TreasuryCard";
 import { AccountForm } from "@/components/app/AccountForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -32,7 +33,7 @@ const BAR_TONES = ["bg-metric-cash", "bg-metric-receivable", "bg-metric-bank", "
 const ROW_PX = 128;
 const GAP_PX = 12;
 
-type Ctx = ReturnType<typeof useStats> & { hidden: boolean; w: number; h: number; openEntry: (t: EntryType) => void; openAccount: () => void };
+type Ctx = ReturnType<typeof useStats> & { editing: boolean; hidden: boolean; w: number; h: number; openEntry: (t: EntryType) => void; openAccount: () => void };
 
 function useStats() {
   const d = useData();
@@ -111,6 +112,7 @@ function Module({ c, icon, title, tone, count, children }: { c: Ctx; icon: typeo
 const lim = (c: Ctx) => Math.max(1, c.h * 3 - 1);
 
 const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> = {
+  treasury: { render: (c) => <TreasuryCard editing={c.editing} w={c.w} /> },
   cash: { to: "/cashbook", render: (c) => <Metric c={c} icon={Wallet} title="Cash in hand" tone="bg-metric-cash" value={c.cashInHand} extra={<span>In this month {money(c, c.monthIn)} · Out {money(c, c.monthOut)}</span>} /> },
   bank: { to: "/banks", render: (c) => <Metric c={c} icon={Landmark} title="Bank balance" tone="bg-metric-bank" value={c.bankTotal} extra={<Rows limit={lim(c)} items={c.funds.filter((f) => f.id !== CASH).map((f) => ({ k: f.id, l: f.name, r: money(c, f.closing) }))} />} /> },
   receivable: { to: "/accounts", render: (c) => <Metric c={c} icon={ArrowDownLeft} title="Receivables" tone="bg-metric-receivable" value={c.receivable} extra={<span>Customer advances {money(c, c.customerAdvance)}</span>} /> },
@@ -235,7 +237,6 @@ function Dashboard() {
   const navigate = useNavigate();
   const [entryType, setEntryType] = useState<EntryType>();
   const [newAcc, setNewAcc] = useState(false);
-  const [showCash, setShowCash] = useState(true);
   const gridRef = useRef<HTMLDivElement>(null);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
@@ -287,9 +288,6 @@ function Dashboard() {
           <p className="mt-1 text-sm text-muted-foreground">Here’s your business snapshot for {fmtDate(todayISO())}.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button aria-label={showCash ? "Hide amounts" : "Show amounts"} onClick={() => setShowCash((v) => !v)} className="rounded-full border bg-card p-2.5 text-muted-foreground shadow-sm hover:text-foreground">
-            {showCash ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-          </button>
           <button aria-pressed={editing} aria-label={editing ? "Lock layout" : "Edit layout"} title={editing ? "Done — lock layout" : "Edit layout (move & resize cards)"} onClick={() => dashboard.setEditing(!editing)}
             className={cn("flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold shadow-sm", editing ? "border-primary bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground")}>
             {editing ? <><Check className="h-4 w-4" /> Done</> : <><Pencil className="h-4 w-4" /> Edit layout</>}
@@ -314,7 +312,7 @@ function Dashboard() {
         {layout.length === 0 && <p className="col-span-full py-10 text-center text-sm text-muted-foreground">No cards on the dashboard. Tap Edit layout → Add / remove cards to add some.</p>}
         {layout.map((w) => {
           const def = WIDGETS[w.id];
-          const ctx: Ctx = { ...stats, hidden: !showCash, w: w.w, h: w.h, openEntry: setEntryType, openAccount: () => setNewAcc(true) };
+          const ctx: Ctx = { ...stats, editing, hidden: false, w: w.w, h: w.h, openEntry: setEntryType, openAccount: () => setNewAcc(true) };
           const open = () => { if (editing || !def.to) return; haptic(10); navigate({ to: def.to }); };
           return (
             <section key={w.id} data-wid={w.id} role={def.to && !editing ? "link" : undefined} tabIndex={def.to && !editing ? 0 : undefined}
