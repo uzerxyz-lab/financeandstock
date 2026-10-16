@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate, useRouter } from "@tanstack/rea
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import {
-  LayoutDashboard, ListOrdered, Users, BookOpen, Receipt, Wallet, ShieldCheck, Settings, LogOut, Search, Menu, ArrowLeft, Lock, Moon, Sun, ShoppingCart, BadgeDollarSign, HandCoins, RefreshCw, CloudUpload, Flame, Zap, Boxes,
+  LayoutDashboard, ListOrdered, Users, BookOpen, Receipt, Wallet, ShieldCheck, Settings, LogOut, Search, Menu, ArrowLeft, Lock, Moon, Sun, ShoppingCart, BadgeDollarSign, HandCoins, RefreshCw, CloudUpload, Flame, Zap, Boxes, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
