@@ -18,6 +18,7 @@
 - [x] Restrict expense picker to five defaults plus newly added categories without erasing historical records
 - [x] Reference-style account directory and ledger history with PIN-gated icon actions, clean print statement
 - [x] Keep chosen theme through lock and login
+- [x] Dashboard cards drawer, Vouchers in menu, dark contrast fixes, blue mobile bottom bar
 - [ ] Full offline caching of the app itself (service worker) — to add next
 - [ ] Optional cloud backup — waiting for user go-ahead
 - [x] Online transfers in Cash in Hand; Vouchers card + page; logo-first print header; worker salary/advance ledger; draft restore fix; Backup & Sync icon; update check; in-app "+ New" popups

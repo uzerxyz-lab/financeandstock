@@ -252,7 +252,17 @@
 .dark { color-scheme: dark; }
 
 /* Warning strips keep readable text in both themes. */
-.dark [class*="bg-warning/"] { color: oklch(0.92 0.08 90); }
+.dark [class*="bg-warning/"], .dark .bg-warning-soft { color: oklch(0.92 0.08 90); }
+.dark .bg-warning-soft { background: oklch(0.32 0.06 75); }
+.dark ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.8; }
+
+/* Mobile bottom navigation: clear blue bar with lifted active tab. */
+.mobile-nav { background: linear-gradient(180deg, oklch(0.42 0.13 255), oklch(0.32 0.11 258)); box-shadow: 0 -6px 20px oklch(0.25 0.08 258 / 0.25); }
+.mobile-nav a { color: oklch(0.88 0.03 250); transition: transform .15s, color .15s; }
+.mobile-nav a:active { transform: scale(0.92); }
+.mobile-nav a .nav-ic { display: grid; place-items: center; height: 2rem; width: 3rem; border-radius: 999px; transition: background .2s; }
+.mobile-nav a.active-tab { color: oklch(0.99 0 0); }
+.mobile-nav a.active-tab .nav-ic { background: oklch(1 0 0 / 0.2); }
 
 /* Solid on phones (blur on many tiles causes lag); light blur on larger screens only. */
 @utility glass {

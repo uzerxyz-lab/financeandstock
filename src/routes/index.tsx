@@ -7,9 +7,11 @@ import {
 import { EntryForm } from "@/components/app/EntryForm";
 import { AccountForm } from "@/components/app/AccountForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { CASH, ENTRY_TYPES, fundList, liveAccounts, liveEntries, liveProduction, partyTotals, stockSummary, useData, type EntryType } from "@/lib/db";
 import { fmtDate, fmtPKR, fmtTon, todayISO } from "@/lib/format";
-import { dashboard, haptic, MAX_H, MAX_W, useDashboard, WIDGET_LABELS, type WidgetId, type WidgetLayout } from "@/lib/dashboard-layout";
+import { ALL_WIDGETS, dashboard, haptic, MAX_H, MAX_W, useDashboard, WIDGET_LABELS, type WidgetId, type WidgetLayout } from "@/lib/dashboard-layout";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -229,7 +231,7 @@ const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> 
 
 function Dashboard() {
   const stats = useStats();
-  const { layout, editing } = useDashboard();
+  const { layout, editing, drawer } = useDashboard();
   const navigate = useNavigate();
   const [entryType, setEntryType] = useState<EntryType>();
   const [newAcc, setNewAcc] = useState(false);
@@ -309,7 +311,7 @@ function Dashboard() {
       )}
 
       <div ref={gridRef} className="grid grid-flow-row-dense grid-cols-2 gap-3 md:grid-cols-4" style={{ gridAutoRows: `${ROW_PX}px` }}>
-        {layout.length === 0 && <p className="col-span-full py-10 text-center text-sm text-muted-foreground">No cards on the dashboard. Open the menu → Dashboard cards to add some.</p>}
+        {layout.length === 0 && <p className="col-span-full py-10 text-center text-sm text-muted-foreground">No cards on the dashboard. Tap Edit layout → Add / remove cards to add some.</p>}
         {layout.map((w) => {
           const def = WIDGETS[w.id];
           const ctx: Ctx = { ...stats, hidden: !showCash, w: w.w, h: w.h, openEntry: setEntryType, openAccount: () => setNewAcc(true) };
@@ -342,6 +344,24 @@ function Dashboard() {
           {newAcc && <AccountForm onSaved={() => setNewAcc(false)} />}
         </DialogContent>
       </Dialog>
+      <Sheet open={drawer} onOpenChange={(o) => dashboard.setDrawer(o)}>
+        <SheetContent side="right" className="w-80 overflow-y-auto">
+          <SheetHeader><SheetTitle>Dashboard cards</SheetTitle></SheetHeader>
+          <p className="mt-1 text-xs text-muted-foreground">Turn cards on or off. Use Edit layout to move and resize them.</p>
+          <div className="mt-4 space-y-1">
+            {ALL_WIDGETS.map((id) => {
+              const on = layout.some((x) => x.id === id);
+              return (
+                <label key={id} className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-muted">
+                  <span>{WIDGET_LABELS[id]}</span>
+                  <Switch checked={on} onCheckedChange={(v) => { haptic(8); dashboard.toggle(id, v); }} />
+                </label>
+              );
+            })}
+          </div>
+          <button onClick={() => dashboard.reset()} className="mt-4 flex w-full items-center justify-center gap-1 rounded-lg border px-3 py-2 text-xs font-semibold"><RotateCcw className="h-3.5 w-3.5" /> Reset to default</button>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
