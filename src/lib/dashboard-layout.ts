@@ -14,7 +14,7 @@ export const WIDGET_LABELS: Record<WidgetId, string> = {
 };
 
 export const DEFAULT_LAYOUT: WidgetLayout[] = [
-  { id: "treasury", w: 4, h: 2 },
+  { id: "treasury", w: 2, h: 3 },
   { id: "stock", w: 2, h: 2 }, { id: "quick", w: 2, h: 2 },
   { id: "vouchers", w: 1, h: 1 }, { id: "advances", w: 1, h: 1 }, { id: "monthly", w: 2, h: 1 },
   { id: "heats", w: 4, h: 2 },
@@ -41,9 +41,14 @@ function load() {
     if (!localStorage.getItem(KEY + "-treasury")) {
       localStorage.setItem(KEY + "-treasury", "1");
       if (!state.layout.some((x) => x.id === "treasury")) {
-        state = { ...state, layout: [{ id: "treasury", w: 4, h: 2 }, ...state.layout.filter((x) => !["cash", "bank", "receivable", "payable"].includes(x.id))] };
+        state = { ...state, layout: [{ id: "treasury", w: 2, h: 3 }, ...state.layout.filter((x) => !["cash", "bank", "receivable", "payable"].includes(x.id))] };
         localStorage.setItem(KEY, JSON.stringify(state.layout));
       }
+    }
+    if (!localStorage.getItem(KEY + "-treasury2")) {
+      localStorage.setItem(KEY + "-treasury2", "1");
+      state = { ...state, layout: state.layout.map((x) => x.id === "treasury" ? { ...x, w: 2, h: 3 } : x) };
+      localStorage.setItem(KEY, JSON.stringify(state.layout));
     }
   } catch { /* keep default */ }
 }

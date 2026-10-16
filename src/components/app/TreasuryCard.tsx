@@ -47,14 +47,14 @@ export function TreasuryCard({ editing, w }: { editing: boolean; w: number }) {
   const open = (p: Panel) => (e: React.MouseEvent) => { e.stopPropagation(); if (editing) return; haptic(10); setPanel(p); };
   const accName = (id?: string) => d.accounts.find((a) => a.id === id)?.name ?? "—";
 
-  const subs: { id: Panel; label: string; value: number; icon: typeof Wallet; tone: string; note?: string; wide?: boolean }[] = [
-    { id: "cash", label: "Cash in hand", value: s.cash.bal, icon: Wallet, tone: "bg-metric-cash" },
-    { id: "bank", label: "Bank balance", value: s.bankTotal, icon: Landmark, tone: "bg-metric-bank" },
-    { id: "receivable", label: "Receivables", value: s.recTotal, icon: ArrowDownLeft, tone: "bg-metric-receivable" },
-    { id: "payable", label: "Payables", value: s.payTotal, icon: ArrowUpRight, tone: "bg-metric-payable" },
-    { id: "cheques", label: "Cheques & clearing", value: pendingAmt, icon: FileCheck2, tone: "bg-chart-4", wide: true,
+  const tiles: { id: Panel; label: string; value: number; icon: typeof Wallet; tone: string; note?: string }[] = [
+    { id: "bank", label: "Bank balance", value: s.bankTotal, icon: Landmark, tone: "bg-tile-bank" },
+    { id: "receivable", label: "Receivables", value: s.recTotal, icon: ArrowDownLeft, tone: "bg-tile-receivable" },
+    { id: "payable", label: "Payables", value: s.payTotal, icon: ArrowUpRight, tone: "bg-tile-payable" },
+    { id: "cheques", label: "Pending cheques", value: pendingAmt, icon: FileCheck2, tone: "bg-tile-cheque",
       note: `${s.pending.length} pending · ${s.cleared.length} cleared · ${s.bounced.length} bounced` },
   ];
+  void w;
 
   const Row = ({ l, sub, r, to }: { l: string; sub?: string; r: number; to?: { id: string } }) => (
     <div className="flex items-center justify-between gap-3 py-2.5 text-sm">
@@ -71,22 +71,24 @@ export function TreasuryCard({ editing, w }: { editing: boolean; w: number }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="truncate text-sm font-semibold">Treasury Position</h2>
+        <h2 className="truncate text-sm font-semibold text-treasury-foreground">Treasury Position</h2>
         <button aria-label={hidden ? "Show amounts" : "Hide amounts"} onClick={toggle} onPointerDown={(e) => e.stopPropagation()}
-          className="rounded-full border bg-background p-2 text-muted-foreground shadow-sm hover:text-foreground">
+          className="rounded-full bg-treasury-foreground/10 p-2 text-treasury-foreground hover:bg-treasury-foreground/20">
           {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      <div className={cn("mt-3 grid min-h-0 flex-1 auto-rows-fr gap-2 overflow-hidden", w >= 3 ? "grid-cols-5" : "grid-cols-2")}>
-        {subs.map((x) => (
+      <div className="mt-2 grid min-h-0 flex-1 grid-cols-2 grid-rows-[1.1fr_1fr_1fr] gap-2 overflow-hidden">
+        <button type="button" onClick={open("cash")}
+          className="col-span-2 flex min-w-0 flex-col justify-center rounded-xl bg-tile-cash px-3 py-2 text-left text-tile-foreground shadow-sm transition-transform active:scale-[0.98]">
+          <span className="flex items-center gap-1.5 text-xs font-medium opacity-85"><Wallet className="h-3.5 w-3.5" /> Cash in hand</span>
+          <span className="num mt-0.5 truncate text-2xl font-semibold tracking-tight">{m(s.cash.bal)}</span>
+        </button>
+        {tiles.map((x) => (
           <button key={x.id} type="button" onClick={open(x.id)}
-            className={cn("flex min-w-0 flex-col justify-between rounded-lg border bg-surface p-2.5 text-left transition-transform active:scale-[0.97]", !editing && "hover:border-primary/50", x.wide && w < 3 && "col-span-2")}>
-            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-primary-foreground", x.tone)}><x.icon className="h-3 w-3" /></span>
-              <span className="truncate">{x.label}</span>
-            </span>
-            <span className="num mt-1 truncate text-base font-semibold tracking-tight">{m(x.value)}</span>
-            {x.note && <span className="truncate text-[10px] text-muted-foreground">{x.note}</span>}
+            className={cn("flex min-w-0 flex-col justify-center rounded-xl px-3 py-2 text-left text-tile-foreground shadow-sm transition-transform active:scale-[0.97]", x.tone)}>
+            <span className="flex items-center gap-1.5 text-[11px] font-medium opacity-85"><x.icon className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{x.label}</span></span>
+            <span className="num mt-0.5 truncate text-base font-semibold tracking-tight">{m(x.value)}</span>
+            {x.note && <span className="truncate text-[10px] opacity-80">{x.note}</span>}
           </button>
         ))}
       </div>

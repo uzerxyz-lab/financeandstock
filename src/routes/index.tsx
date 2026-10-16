@@ -317,7 +317,7 @@ function Dashboard() {
           return (
             <section key={w.id} data-wid={w.id} role={def.to && !editing ? "link" : undefined} tabIndex={def.to && !editing ? 0 : undefined}
               onClick={open} onKeyDown={(e) => e.key === "Enter" && open()}
-              className={cn("widget relative overflow-hidden rounded-xl border bg-card p-4 shadow-sm", editing ? "ring-2 ring-primary/30 ring-offset-1 ring-offset-background" : def.to && "card-hover cursor-pointer active:scale-[0.98]", "transition-transform")}
+              className={cn("widget relative overflow-hidden rounded-xl border bg-card p-4 shadow-sm", w.id === "treasury" && "border-transparent bg-treasury p-3", editing ? "ring-2 ring-primary/30 ring-offset-1 ring-offset-background" : def.to && "card-hover cursor-pointer active:scale-[0.98]", "transition-transform")}
               style={{ "--w": w.w, gridRow: `span ${w.h}` } as React.CSSProperties}
               aria-label={WIDGET_LABELS[w.id]}>
               {def.render(ctx)}
