@@ -2,12 +2,11 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowDownLeft, ArrowUpRight, Eye, EyeOff, FileCheck2, Landmark, Wallet } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { accountBalance, CASH, entryState, fundName, liveAccounts, liveEntries, todayISO as _t, updateEntry, useData, type ChequeStatus } from "@/lib/db";
+import { accountBalance, entryState, fundList, fundName, liveAccounts, liveEntries, updateEntry, useData, type ChequeStatus } from "@/lib/db";
 import { fmtDate, fmtPKR, todayISO } from "@/lib/format";
 import { haptic } from "@/lib/dashboard-layout";
 import { cn } from "@/lib/utils";
 
-void _t;
 type Panel = "cash" | "bank" | "receivable" | "payable" | "cheques";
 const HIDE_KEY = "cashbook-treasury-hidden";
 
@@ -18,31 +17,13 @@ export function TreasuryCard({ editing, w }: { editing: boolean; w: number }) {
   const [tab, setTab] = useState<ChequeStatus>("pending");
 
   const s = useMemo(() => {
-    const funds = [CASH, ...d.banks.filter((b) => !b.deletedAt).map((b) => b.id)];
     const live = liveEntries(d);
-    const ledgerOf = (fund: string) => {
-      let bal = fund === CASH ? d.opening?.cash ?? 0 : d.banks.find((b) => b.id === fund)?.openingBalance ?? 0;
-      let pending = 0, inToday = 0, outToday = 0;
-      const today = todayISO();
-      for (const e of live) {
-        const moves = e.type === "transfer"
-          ? [{ f: e.bankId ?? CASH, v: -e.amount }, { f: e.toBankId ?? CASH, v: e.amount }]
-          : [];
-        if (!moves.length) {
-          const flow = ({ inward: 1, capital: 1, outward: -1, salary: -1, advance: -1, expense: -1 } as Record<string, number>)[e.type];
-          if (!flow) continue;
-          moves.push({ f: !e.method || e.method === "cash" ? CASH : e.bankId ?? "bank-unassigned", v: flow * e.amount });
-        }
-        for (const m of moves) {
-          if (m.f !== fund) continue;
-          const st = entryState(e);
-          if (st === "cleared") { bal += m.v; if (e.date === today) m.v > 0 ? (inToday += m.v) : (outToday -= m.v); }
-          else if (st === "pending") pending += m.v;
-        }
-      }
-      return { id: fund, name: fundName(d, fund), bal, pending, inToday, outToday };
-    };
-    const all = funds.map(ledgerOf);
+    const today = todayISO();
+    const all = fundList(d).map((f) => ({
+      id: f.id, name: f.name, bal: f.closing, pending: f.pending,
+      inToday: f.rows.filter((r) => r.state === "cleared" && r.e.date === today && r.delta > 0).reduce((x, r) => x + r.delta, 0),
+      outToday: f.rows.filter((r) => r.state === "cleared" && r.e.date === today && r.delta < 0).reduce((x, r) => x - r.delta, 0),
+    }));
     const parties = liveAccounts(d).filter((a) => !a.equity).map((a) => ({ a, b: accountBalance(d, a.id) }));
     const receivables = parties.filter((p) => p.b > 0 && p.a.type !== "supplier").sort((x, y) => y.b - x.b);
     const payables = parties.filter((p) => p.b < 0 && p.a.type !== "buyer").map((p) => ({ ...p, b: -p.b })).sort((x, y) => y.b - x.b);
