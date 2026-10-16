@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { fieldError } from "@/lib/field-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PK_BANKS } from "@/lib/banks";
 import { AccountSearch, Field, NativeSelect, TitleInput } from "./inputs";
 import { useNamePrompt } from "./NameDialog";
 import {
@@ -282,9 +283,19 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           {method !== "cash" && (
             <Field id="f-bank" label="Bank Account *">
               <div className="flex gap-2">
-                <NativeSelect value={bankId} onChange={(e) => { setBankId(e.target.value); setBank(d.banks.find((b) => b.id === e.target.value)?.name ?? ""); }}>
-                  <option value="">Select bank…</option>
-                  {liveBanks(d).map((b) => <option key={b.id} value={b.id}>{b.name}{b.accountNo ? ` · ${b.accountNo}` : ""}</option>)}
+                <NativeSelect value={bankId} onChange={(e) => {
+                  const v = e.target.value;
+                  if (v.startsWith("pk:")) {
+                    const name = v.slice(3);
+                    const ex = liveBanks(getData()).find((b) => b.name === name);
+                    const b = ex ?? addBank({ name, openingBalance: 0 });
+                    setBankId(b.id); setBank(b.name); return;
+                  }
+                  setBankId(v); setBank(d.banks.find((b) => b.id === v)?.name ?? "");
+                }}>
+                  <option value="" disabled>Select bank…</option>
+                  {liveBanks(d).length > 0 && <optgroup label="My accounts">{liveBanks(d).map((b) => <option key={b.id} value={b.id}>{b.name}{b.accountNo ? ` · ${b.accountNo}` : ""}</option>)}</optgroup>}
+                  <optgroup label="Pakistani banks">{PK_BANKS.filter((n) => !liveBanks(d).some((b) => b.name === n)).map((n) => <option key={n} value={`pk:${n}`}>{n}</option>)}</optgroup>
                 </NativeSelect>
                 <Button type="button" variant="outline" size="sm" className="h-9" onClick={async () => {
                   const name = await names.ask("New bank account", "e.g. Meezan Bank");

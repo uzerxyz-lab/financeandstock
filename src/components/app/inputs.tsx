@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, forwardRef } from "react";
+import { Children, Fragment, isValidElement, useEffect, useRef, useState, forwardRef } from "react";
+import { Check, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { titleCase, fmtDateTime } from "@/lib/format";
 import { Logo } from "@/components/app/Logo";
@@ -22,15 +24,53 @@ export function Field({ label, children, className, id }: { label: string; child
   );
 }
 
-export function NativeSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+type Opt = { value: string; label: React.ReactNode; text: string; disabled?: boolean; group?: string };
+const textOf = (n: React.ReactNode): string => Children.toArray(n).map((c) => (typeof c === "string" || typeof c === "number" ? String(c) : isValidElement<{ children?: React.ReactNode }>(c) ? textOf(c.props.children) : "")).join("");
+function collect(children: React.ReactNode, group?: string, out: Opt[] = []) {
+  Children.forEach(children, (c) => {
+    if (!isValidElement<{ children?: React.ReactNode; value?: string | number; disabled?: boolean; label?: string }>(c)) return;
+    if (c.type === "option") out.push({ value: String(c.props.value ?? textOf(c.props.children)), label: c.props.children, text: textOf(c.props.children), disabled: c.props.disabled, group });
+    else if (c.type === "optgroup") collect(c.props.children, c.props.label, out);
+    else if (c.type === Fragment) collect(c.props.children, group, out);
+  });
+  return out;
+}
+
+/** App-styled dropdown (replaces the browser's native select menu). Same API: <option>/<optgroup> children + onChange(e.target.value). */
+export function NativeSelect({ value, onChange, disabled, className, children, id }: { value?: string | number | readonly string[] | undefined; onChange?: (e: { target: { value: string } }) => void; disabled?: boolean; className?: string; children?: React.ReactNode; id?: string }) {
+  const [open, setOpen] = useState(false);
+  const opts = collect(children);
+  const cur = opts.find((o) => o.value === String(value ?? ""));
+  const many = opts.length > 10;
+  const [q, setQ] = useState("");
+  const shown = many && q ? opts.filter((o) => o.text.toLowerCase().includes(q.toLowerCase())) : opts;
   return (
-    <select
-      {...props}
-      className={cn(
-        "h-9 w-full rounded-md border border-input bg-card px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        props.className,
-      )}
-    />
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQ(""); }}>
+      <PopoverTrigger asChild disabled={disabled}>
+        <button type="button" id={id} disabled={disabled}
+          className={cn("flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-card px-3 text-left text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50", className)}>
+          <span className={cn("truncate", (!cur || cur.disabled) && "text-muted-foreground")}>{cur ? cur.label : "Select…"}</span>
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] min-w-48 p-1" onOpenAutoFocus={(e) => { if (!many) e.preventDefault(); }}>
+        {many && <Input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="mb-1 h-8" />}
+        <div className="max-h-64 overflow-y-auto">
+          {shown.length === 0 && <div className="px-2 py-1.5 text-sm text-muted-foreground">No match</div>}
+          {shown.map((o, i) => (
+            <Fragment key={`${o.group ?? ""}:${o.value}:${i}`}>
+              {o.group && o.group !== shown[i - 1]?.group && <div className="px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{o.group}</div>}
+              <button type="button" disabled={o.disabled}
+                onClick={() => { setOpen(false); setQ(""); if (o.value !== String(value ?? "")) onChange?.({ target: { value: o.value } }); }}
+                className={cn("flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50", o.value === cur?.value && "bg-accent/60 font-medium")}>
+                <span className="truncate">{o.label}</span>
+                {o.value === cur?.value && <Check className="h-4 w-4 shrink-0" />}
+              </button>
+            </Fragment>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
