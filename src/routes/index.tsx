@@ -61,14 +61,14 @@ function useStats() {
       salesCount: live.filter((e) => e.type === "sale").length,
       purchaseCount: live.filter((e) => e.type === "purchase").length,
       expenseCount: live.filter((e) => e.type === "expense").length,
-      bills: d.heatBills ?? [],
+      bills: d.bills ?? [],
     };
   }, [d]);
 }
 
 const money = (c: Ctx, v: number) => (c.hidden ? "Rs ••••••" : fmtPKR(v));
 
-function Head({ icon: Icon, title, tone = "bg-primary", sub }: { icon: typeof Wallet; title: string; tone?: string; sub?: string }) {
+function Head({ icon: Icon, title, tone = "bg-primary", sub }: { icon: typeof Wallet; title: string; tone?: string; sub?: string | undefined }) {
   return (
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
