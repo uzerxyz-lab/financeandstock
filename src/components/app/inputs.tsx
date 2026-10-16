@@ -24,7 +24,7 @@ export function Field({ label, children, className, id }: { label: string; child
   );
 }
 
-type Opt = { value: string; label: React.ReactNode; text: string; disabled?: boolean; group?: string };
+type Opt = { value: string; label: React.ReactNode; text: string; disabled?: boolean | undefined; group?: string | undefined };
 const textOf = (n: React.ReactNode): string => Children.toArray(n).map((c) => (typeof c === "string" || typeof c === "number" ? String(c) : isValidElement<{ children?: React.ReactNode }>(c) ? textOf(c.props.children) : "")).join("");
 function collect(children: React.ReactNode, group?: string, out: Opt[] = []) {
   Children.forEach(children, (c) => {
