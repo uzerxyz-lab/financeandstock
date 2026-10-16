@@ -1,1 +1,0 @@
-REVOKE ALL ON public.cloud_backups FROM anon;
