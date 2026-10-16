@@ -59,7 +59,7 @@ export function TreasuryCard({ editing, w }: { editing: boolean; w: number }) {
   const Row = ({ l, sub, r, to }: { l: string; sub?: string; r: number; to?: { id: string } }) => (
     <div className="flex items-center justify-between gap-3 py-2.5 text-sm">
       <div className="min-w-0">
-        {to ? <Link to="/accounts/$id" params={to} className="block truncate font-medium hover:underline" onClick={() => setPanel(undefined)}>{l}</Link> : <div className="truncate font-medium">{l}</div>}
+        {to ? <Link to="/ledger/$id" params={to} className="block truncate font-medium hover:underline" onClick={() => setPanel(undefined)}>{l}</Link> : <div className="truncate font-medium">{l}</div>}
         {sub && <div className="truncate text-xs text-muted-foreground">{sub}</div>}
       </div>
       <span className="num shrink-0 font-semibold">{m(r)}</span>
