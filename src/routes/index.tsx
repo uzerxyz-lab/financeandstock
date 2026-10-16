@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  ArrowDownLeft, ArrowUpRight, Banknote, BarChart3, BookOpen, Boxes, Check, Eye, EyeOff, Flame, GripVertical, HandCoins, LayoutGrid, Landmark,
+  ArrowDownLeft, ArrowUpRight, Banknote, BarChart3, BookOpen, Boxes, Check, Flame, GripVertical, HandCoins, LayoutGrid, Landmark,
   ListOrdered, Maximize2, Pencil, Plus, Receipt, RotateCcw, ShoppingCart, BadgeDollarSign, Users, Wallet, Zap, FileText,
 } from "lucide-react";
 import { EntryForm } from "@/components/app/EntryForm";
