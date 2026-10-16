@@ -18,26 +18,39 @@ import { backupToCloud, scheduleAutoBackup } from "@/lib/cloud";
 import { checkForUpdate } from "@/lib/update";
 import { supabase } from "@/integrations/supabase/client";
 
-const NAV = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/entries", label: "All Entries", icon: ListOrdered },
-  { to: "/vouchers", label: "Vouchers", icon: FileText },
-  { to: "/accounts", label: "Accounts", icon: Users },
-  { to: "/sales", label: "Sales", icon: BadgeDollarSign },
-  { to: "/purchases", label: "Purchases", icon: ShoppingCart },
-  { to: "/workers", label: "Workers", icon: Users },
-  { to: "/loans", label: "Personal Loans", icon: HandCoins },
-  { to: "/cashbook", label: "Cash Book", icon: Wallet },
-  { to: "/banks", label: "Cash & Banks", icon: Wallet },
-  { to: "/stock", label: "Stock", icon: Boxes },
-  { to: "/production", label: "Heat Production", icon: Flame },
-  { to: "/electricity", label: "Electricity", icon: Zap },
-  { to: "/opening", label: "Opening Balances", icon: BookOpen },
-  { to: "/expenses", label: "Expenses", icon: Receipt },
-  { to: "/reports", label: "Reports", icon: BookOpen },
-  { to: "/admin", label: "Admin Panel", icon: ShieldCheck },
-  { to: "/settings", label: "Settings & Backup", icon: Settings },
-];
+const NAV_GROUPS = [
+  { title: "Overview", items: [
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/entries", label: "All Entries", icon: ListOrdered },
+    { to: "/vouchers", label: "Vouchers", icon: FileText },
+  ] },
+  { title: "Operations & Plant", items: [
+    { to: "/production", label: "Heat Production", icon: Flame },
+    { to: "/stock", label: "Stock & Inventory", icon: Boxes },
+    { to: "/electricity", label: "Electricity", icon: Zap },
+  ] },
+  { title: "Trading & Accounts", items: [
+    { to: "/sales", label: "Sales", icon: BadgeDollarSign },
+    { to: "/purchases", label: "Purchases", icon: ShoppingCart },
+    { to: "/accounts", label: "Accounts & Parties", icon: Users },
+    { to: "/expenses", label: "Expenses", icon: Receipt },
+  ] },
+  { title: "Treasury & Payroll", items: [
+    { to: "/cashbook", label: "Cash Book", icon: Wallet },
+    { to: "/banks", label: "Cash & Banks", icon: Wallet },
+    { to: "/workers", label: "Workers & Wages", icon: Users },
+    { to: "/loans", label: "Personal Loans", icon: HandCoins },
+  ] },
+  { title: "Reports & Financials", items: [
+    { to: "/reports", label: "Financial Reports", icon: BookOpen },
+    { to: "/opening", label: "Opening Balances", icon: BookOpen },
+  ] },
+  { title: "System & Administration", items: [
+    { to: "/admin", label: "Admin Panel", icon: ShieldCheck },
+    { to: "/settings", label: "Settings & Backup", icon: Settings },
+  ] },
+] as const;
+const NAV = NAV_GROUPS.flatMap((g) => [...g.items]);
 
 const SESSION = "cashbook-session";
 const LOGGED_OUT = "cashbook-logged-out";
@@ -132,7 +145,10 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
     </div>
   );
   const navItems = (onNavigate?: () => void) =>
-    NAV.map((n) => (
+    NAV_GROUPS.map((g) => (
+      <div key={g.title} className="pb-1">
+        <div className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/50">{g.title}</div>
+        {g.items.map((n) => (
       <Link
         key={n.to}
         to={n.to}
@@ -143,6 +159,8 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
       >
         <n.icon className="h-4 w-4 shrink-0" /> {n.label}
       </Link>
+        ))}
+      </div>
     ));
   return (
     <div className="min-h-screen bg-background md:flex">
@@ -151,7 +169,6 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
         <div className="px-5 pb-5 pt-6">
           <Link to="/"><img src={whiteLogo} alt="Mussa Enterprises" className="h-auto w-40 object-contain" /></Link>
         </div>
-        <div className="px-6 pb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/50">Workspace</div>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3">{navItems()}</nav>
         <div className="space-y-3 border-t border-sidebar-border p-4 text-xs text-sidebar-foreground/70">
           <div className="inline-flex items-center gap-2 rounded-full bg-sidebar-accent px-3 py-1.5 text-sidebar-accent-foreground">
@@ -175,18 +192,20 @@ function Shell({ onLogout, dark, onToggleTheme }: { onLogout: (full?: boolean) =
                 </SheetTrigger>
                 <SheetContent side="left" className="w-72 bg-sidebar p-0 text-sidebar-foreground">
                   <SheetHeader className="border-b border-sidebar-border p-4"><SheetTitle><img src={whiteLogo} alt="Mussa Enterprises" className="h-auto w-40 object-contain" /></SheetTitle></SheetHeader>
-                  <div className="space-y-1 p-3">
+                  <div className="space-y-1 overflow-y-auto p-3" style={{ maxHeight: "calc(100vh - 5rem)" }}>
                     <SheetClose asChild>
                       <button onClick={() => router.history.back()} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent"><ArrowLeft className="h-4 w-4" /> Back</button>
                     </SheetClose>
                     <div className="my-2 border-t border-sidebar-border" />
-                    {NAV.map((n) => (
+                    {NAV_GROUPS.map((g) => (<div key={g.title}>
+                      <div className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/50">{g.title}</div>
+                      {g.items.map((n) => (
                       <SheetClose asChild key={n.to}>
                         <Link to={n.to} activeOptions={{ exact: n.to === "/" }} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent" activeProps={{ className: "bg-sidebar-accent font-medium text-sidebar-accent-foreground" }}>
                           <n.icon className="h-4 w-4" /> {n.label}
                         </Link>
                       </SheetClose>
-                    ))}
+                    ))}</div>))}
                     <div className="my-2 border-t border-sidebar-border" />
                     <button onClick={onToggleTheme} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {dark ? "Day mode" : "Night mode"}</button>
                     <SheetClose asChild>
