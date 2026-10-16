@@ -12,4 +12,7 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Pre-bundle lazily discovered UI deps so Vite never re-optimizes mid-session
+  // (a mid-session re-optimize leaves two React copies → "reading 'useState' of null").
+  vite: { optimizeDeps: { include: ["@radix-ui/react-popover", "@radix-ui/react-dialog", "@radix-ui/react-switch"] } },
 });
