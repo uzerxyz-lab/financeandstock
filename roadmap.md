@@ -24,4 +24,4 @@
 - [x] Online transfers in Cash in Hand; Vouchers card + page; logo-first print header; worker salary/advance ledger; draft restore fix; Backup & Sync icon; update check; in-app "+ New" popups
 - [x] Voucher share as image with thank-you footer; opening balance type rule; required Sale Type; field error highlight + vibration
 - [x] Voucher Previous Balance moved below the Bank line
-- [ ] Earlier agreed UI package: 23 alphabetical banks in dropdowns, app-styled dropdowns (no browser selects), sidebar in 6 groups (Overview … System & Administration), compact two-column forms in dim-background pop-ups
+- [x] Earlier agreed UI package: 23 alphabetical banks in dropdowns, app-styled dropdowns (no browser selects), sidebar in 6 groups (Overview … System & Administration), compact two-column forms in dim-background pop-ups

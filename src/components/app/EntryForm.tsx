@@ -187,19 +187,19 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Field label="Date">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
         {meta.party ? (
-          <Field id="f-account" label={type === "salary" || type === "advance" ? "Worker" : "Account"} className="lg:col-span-2">
+          <Field id="f-account" label={type === "salary" || type === "advance" ? "Worker" : "Account"} className="col-span-2">
             {type === "sale" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="buyer" onSelect={(a) => setAccountId(a.id)} />
               : type === "purchase" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="supplier" onSelect={(a) => setAccountId(a.id)} />
                 : type === "salary" || type === "advance" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="worker" onSelect={(a) => setAccountId(a.id)} />
                   : <AccountSearch key={formKey} id="entry-account" value={accountId} onSelect={(a) => setAccountId(a.id)} />}
           </Field>
         ) : (
-          <Field label="Category" className="lg:col-span-2">
+          <Field label="Category" className="col-span-2">
             <div className="flex gap-2">
               <NativeSelect value={categoryId} onChange={(e) => {
                 const name = d.categories.find((c) => c.id === e.target.value)?.name.toLowerCase();
@@ -218,12 +218,12 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           </Field>
         )}
         {type === "expense" && (
-          <Field id="f-paidto" label="Paid To (Account) *" className="lg:col-span-2">
+          <Field id="f-paidto" label="Paid To (Account) *" className="col-span-2">
             <AccountSearch key={formKey} id="entry-account" value={accountId} onSelect={(a) => setAccountId(a.id)} />
           </Field>
         )}
         {trade && (
-          <Field id="f-material" label="Material *">
+          <Field id="f-material" label="Material *" className="col-span-2 sm:col-span-1">
             <div className="flex gap-2">
               <NativeSelect value={materialId} onChange={(e) => setMaterialId(e.target.value)}>
                 <option value="">Select material…</option>
@@ -264,7 +264,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       {amt > 0 && <p className="-mt-2 text-right text-xs text-muted-foreground">{amountInWords(amt)}</p>}
 
       {showPay && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <Field label="Payment Method">
             <NativeSelect value={method} onChange={(e) => setMethod(e.target.value as PayMethod)}>
               {Object.entries(METHODS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -281,7 +281,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
             </Field>
           )}
           {method !== "cash" && (
-            <Field id="f-bank" label="Bank Account *">
+            <Field id="f-bank" label="Bank Account *" className="col-span-2">
               <div className="flex gap-2">
                 <NativeSelect value={bankId} onChange={(e) => {
                   const v = e.target.value;
