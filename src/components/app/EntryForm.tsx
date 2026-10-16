@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { fieldError } from "@/lib/field-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PK_BANKS } from "@/lib/banks";
 import { AccountSearch, Field, NativeSelect, TitleInput } from "./inputs";
 import { useNamePrompt } from "./NameDialog";
 import {
@@ -186,19 +187,19 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Field label="Date">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
         {meta.party ? (
-          <Field id="f-account" label={type === "salary" || type === "advance" ? "Worker" : "Account"} className="lg:col-span-2">
+          <Field id="f-account" label={type === "salary" || type === "advance" ? "Worker" : "Account"} className="col-span-2">
             {type === "sale" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="buyer" onSelect={(a) => setAccountId(a.id)} />
               : type === "purchase" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="supplier" onSelect={(a) => setAccountId(a.id)} />
                 : type === "salary" || type === "advance" ? <AccountSearch key={formKey} id="entry-account" value={accountId} accountType="worker" onSelect={(a) => setAccountId(a.id)} />
                   : <AccountSearch key={formKey} id="entry-account" value={accountId} onSelect={(a) => setAccountId(a.id)} />}
           </Field>
         ) : (
-          <Field label="Category" className="lg:col-span-2">
+          <Field label="Category" className="col-span-2">
             <div className="flex gap-2">
               <NativeSelect value={categoryId} onChange={(e) => {
                 const name = d.categories.find((c) => c.id === e.target.value)?.name.toLowerCase();
@@ -217,12 +218,12 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           </Field>
         )}
         {type === "expense" && (
-          <Field id="f-paidto" label="Paid To (Account) *" className="lg:col-span-2">
+          <Field id="f-paidto" label="Paid To (Account) *" className="col-span-2">
             <AccountSearch key={formKey} id="entry-account" value={accountId} onSelect={(a) => setAccountId(a.id)} />
           </Field>
         )}
         {trade && (
-          <Field id="f-material" label="Material *">
+          <Field id="f-material" label="Material *" className="col-span-2 sm:col-span-1">
             <div className="flex gap-2">
               <NativeSelect value={materialId} onChange={(e) => setMaterialId(e.target.value)}>
                 <option value="">Select material…</option>
@@ -263,7 +264,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       {amt > 0 && <p className="-mt-2 text-right text-xs text-muted-foreground">{amountInWords(amt)}</p>}
 
       {showPay && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <Field label="Payment Method">
             <NativeSelect value={method} onChange={(e) => setMethod(e.target.value as PayMethod)}>
               {Object.entries(METHODS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -280,11 +281,21 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
             </Field>
           )}
           {method !== "cash" && (
-            <Field id="f-bank" label="Bank Account *">
+            <Field id="f-bank" label="Bank Account *" className="col-span-2">
               <div className="flex gap-2">
-                <NativeSelect value={bankId} onChange={(e) => { setBankId(e.target.value); setBank(d.banks.find((b) => b.id === e.target.value)?.name ?? ""); }}>
-                  <option value="">Select bank…</option>
-                  {liveBanks(d).map((b) => <option key={b.id} value={b.id}>{b.name}{b.accountNo ? ` · ${b.accountNo}` : ""}</option>)}
+                <NativeSelect value={bankId} onChange={(e) => {
+                  const v = e.target.value;
+                  if (v.startsWith("pk:")) {
+                    const name = v.slice(3);
+                    const ex = liveBanks(getData()).find((b) => b.name === name);
+                    const b = ex ?? addBank({ name, openingBalance: 0 });
+                    setBankId(b.id); setBank(b.name); return;
+                  }
+                  setBankId(v); setBank(d.banks.find((b) => b.id === v)?.name ?? "");
+                }}>
+                  <option value="" disabled>Select bank…</option>
+                  {liveBanks(d).length > 0 && <optgroup label="My accounts">{liveBanks(d).map((b) => <option key={b.id} value={b.id}>{b.name}{b.accountNo ? ` · ${b.accountNo}` : ""}</option>)}</optgroup>}
+                  <optgroup label="Pakistani banks">{PK_BANKS.filter((n) => !liveBanks(d).some((b) => b.name === n)).map((n) => <option key={n} value={`pk:${n}`}>{n}</option>)}</optgroup>
                 </NativeSelect>
                 <Button type="button" variant="outline" size="sm" className="h-9" onClick={async () => {
                   const name = await names.ask("New bank account", "e.g. Meezan Bank");
