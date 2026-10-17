@@ -129,8 +129,8 @@
   --login-arrow-trail: oklch(0.84 0.12 92);
   --login-mesh: oklch(0.06 0 0 / 0.5);
   --radius: 0.65rem;
-  --background: oklch(0.56 0.018 257);
-  --foreground: oklch(0.2 0.02 250);
+  --background: oklch(0.968 0.002 247);
+  --foreground: oklch(0.285 0.02 175);
   --surface: oklch(0.955 0.004 220);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.285 0.02 175);
@@ -141,7 +141,7 @@
   --secondary: oklch(0.945 0.003 247);
   --secondary-foreground: oklch(0.32 0.005 260);
   --muted: oklch(0.945 0.003 247);
-  --muted-foreground: oklch(0.3 0.015 250);
+  --muted-foreground: oklch(0.45 0.015 190);
   --accent: oklch(0.94 0.004 220);
   --accent-foreground: oklch(0.32 0.005 260);
   --destructive: oklch(0.55 0.17 25);
