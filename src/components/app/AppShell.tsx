@@ -95,6 +95,23 @@ function useShortcuts() {
   }, [navigate]);
 }
 
+function SplashScreen() {
+  return (
+    <div className="splash" role="status" aria-label="Loading Mussa Enterprises">
+      <div aria-hidden="true" className="splash-orb splash-orb-1" />
+      <div aria-hidden="true" className="splash-orb splash-orb-2" />
+      <div aria-hidden="true" className="splash-orb splash-orb-3" />
+      <div aria-hidden="true" className="splash-frost" />
+      <div className="splash-content">
+        <img src={mussaMark} alt="" className="splash-mark" />
+        <div className="splash-title">Mussa Enterprises</div>
+        <div aria-hidden="true" className="splash-bar"><span /></div>
+      </div>
+    </div>
+  );
+}
+
+
 export function AppShell() {
   const loaded = useLoaded();
   const d = useData();
@@ -112,7 +129,7 @@ export function AppShell() {
     localStorage.setItem("cashbook-theme", dark ? "dark" : "light");
   }, [dark]);
 
-  if (!loaded) return <div className="flex min-h-screen items-center justify-center bg-background"><img src={mussaMark} alt="Mussa Enterprises" className="h-14 w-14 object-contain" /></div>;
+  if (!loaded) return <SplashScreen />;
   if (!d.auth || !authed) return <Login firstRun={!d.auth} requireUsername={localStorage.getItem(LOGGED_OUT) === "1"} onDone={() => { sessionStorage.setItem(SESSION, "1"); localStorage.removeItem(LOGGED_OUT); setAuthed(true); }} />;
   return <Shell dark={dark ?? false} onToggleTheme={() => setDark((v) => !v)} onLogout={(full?: boolean) => { sessionStorage.removeItem(SESSION); if (full) localStorage.setItem(LOGGED_OUT, "1"); setAuthed(false); }} />;
 }
@@ -326,7 +343,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
       {/* Mobile backdrop: same industrial photo + dark overlay behind the glass card */}
       <div aria-hidden="true" className="absolute inset-0 md:hidden">
         <img src={loginBg.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-login-glass/70 via-login-tint/55 to-login-glass/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-login-glass/55 via-login-tint/35 to-login-glass/55" />
         <div className="login-mobile-vignette absolute inset-0" />
       </div>
       {/* Mobile corner accents */}
@@ -363,7 +380,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
         </div>
       </div>
       <div className="relative flex min-w-0 items-center justify-center px-6 pb-28 pt-48 md:px-4 md:py-8 lg:px-6">
-        <form onSubmit={submit} className="dark w-full max-w-sm space-y-4 rounded-2xl border border-login-foreground/15 bg-login-glass/40 p-6 text-login-foreground shadow-2xl backdrop-blur-md md:border-login-foreground/10 md:bg-login-glass/65 md:backdrop-blur-xl lg:p-8">
+        <form onSubmit={submit} className="login-panel dark w-full max-w-sm space-y-4 rounded-2xl p-6 text-login-foreground lg:p-8">
           <img src={whiteLogo} alt="Mussa Enterprises" className="mx-auto mb-2 h-auto w-64 max-w-full object-contain" />
           <div className="border-t border-login-foreground/10 pt-4">
             <h1 className="text-xl font-semibold">{firstRun ? "Set Up Your Cash Control" : forgot ? "Reset password" : "Sign in"}</h1>
@@ -388,7 +405,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
               <Input type="password" inputMode="numeric" value={pw2} onChange={(e) => setPw2(e.target.value.replace(/\D/g, "").slice(0, 8))} />
             </Field>
           )}
-          <Button type="submit" className="w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
+          <Button type="submit" className="login-cta w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
           {!needsSetup && (
             <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full">
               {forgot ? "Back to sign in" : "Forgot password?"}
