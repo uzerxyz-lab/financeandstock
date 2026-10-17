@@ -1,9 +1,12 @@
 {
   "name": "Mussa Enterprises — Cash Book",
   "short_name": "Mussa Ledger",
+  "id": "/?app=mussa-ledger",
   "start_url": "/",
+  "scope": "/",
+  "orientation": "portrait",
   "display": "standalone",
-  "background_color": "#e2e7ed",
+  "background_color": "#1f2a3d",
   "theme_color": "#1f2a3d",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

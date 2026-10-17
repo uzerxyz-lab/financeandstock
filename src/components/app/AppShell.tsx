@@ -128,8 +128,13 @@ export function AppShell() {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("cashbook-theme", dark ? "dark" : "light");
   }, [dark]);
+  const [minDone, setMinDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMinDone(true), 1300);
+    return () => clearTimeout(t);
+  }, []);
 
-  if (!loaded) return <SplashScreen />;
+  if (!loaded || !minDone) return <SplashScreen />;
   if (!d.auth || !authed) return <Login firstRun={!d.auth} requireUsername={localStorage.getItem(LOGGED_OUT) === "1"} onDone={() => { sessionStorage.setItem(SESSION, "1"); localStorage.removeItem(LOGGED_OUT); setAuthed(true); }} />;
   return <Shell dark={dark ?? false} onToggleTheme={() => setDark((v) => !v)} onLogout={(full?: boolean) => { sessionStorage.removeItem(SESSION); if (full) localStorage.setItem(LOGGED_OUT, "1"); setAuthed(false); }} />;
 }
