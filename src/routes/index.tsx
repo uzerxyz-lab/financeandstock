@@ -174,9 +174,9 @@ const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> 
             </button>
           ))}
           {(c.h > 1 || c.w > 1) && <>
-            <Link to="/production" className={cn(btnCls, "bg-entry-card-soft text-entry-card")}>
+            <Link to="/production" title="Record heat" className={cn(btnCls, "bg-entry-card-soft text-entry-card")}>
               <Flame className="h-4 w-4 shrink-0" strokeWidth={2.1} />
-              <span className="truncate">Record heat</span>
+              <span className="truncate">Heat</span>
             </Link>
             <button onClick={c.openAccount} className={cn(btnCls, "bg-account-soft text-account")}>
               <Users className="h-4 w-4 shrink-0" strokeWidth={2.1} />
