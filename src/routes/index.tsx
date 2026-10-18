@@ -71,14 +71,14 @@ function useStats() {
 
 const money = (c: Ctx, v: number) => (c.hidden ? "Rs ••••••" : fmtPKR(v));
 
-function Head({ icon: Icon, title, tone = "bg-primary", sub }: { icon: typeof Wallet; title: string; tone?: string; sub?: string | undefined }) {
+function Head({ icon: Icon, title, tone = "bg-primary", sub }: { icon?: typeof Wallet; title: string; tone?: string; sub?: string | undefined }) {
   return (
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
         <div className="truncate text-xs font-semibold text-muted-foreground">{title}</div>
         {sub && <div className="mt-0.5 truncate text-[10px] text-muted-foreground">{sub}</div>}
       </div>
-      <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-primary-foreground shadow-sm", tone)}><Icon className="h-5 w-5" strokeWidth={1.9} /></span>
+      {Icon && <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-primary-foreground shadow-sm", tone)}><Icon className="h-5 w-5" strokeWidth={1.9} /></span>}
     </div>
   );
 }
