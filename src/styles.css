@@ -281,7 +281,13 @@
 /* Warning strips keep readable text in both themes. */
 .dark [class*="bg-warning/"], .dark .bg-warning-soft { color: oklch(0.92 0.08 90); }
 .dark .bg-warning-soft { background: oklch(0.32 0.06 75); }
-.dark ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.8; }
+.dark ::-webkit-calendar-picker-indicator { opacity: 0.9; cursor: pointer; }
+
+/* Opening Setup reminder: soft crimson alert balanced for both themes. */
+.setup-alert { background: oklch(0.965 0.022 18); border: 1px solid oklch(0.82 0.08 18); color: oklch(0.32 0.09 20); }
+.setup-alert .setup-cta { color: oklch(0.52 0.19 22); }
+.dark .setup-alert { background: oklch(0.27 0.06 18); border-color: oklch(0.45 0.11 20); color: oklch(0.92 0.03 18); }
+.dark .setup-alert .setup-cta { color: oklch(0.78 0.13 20); }
 
 /* Mobile bottom navigation: clear blue bar with lifted active tab. */
 .mobile-nav { background: linear-gradient(180deg, oklch(0.42 0.13 255), oklch(0.32 0.11 258)); box-shadow: 0 -6px 20px oklch(0.25 0.08 258 / 0.25); }
