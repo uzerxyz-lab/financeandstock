@@ -213,21 +213,24 @@
 }
 
 .dark {
-  --background: oklch(0.2 0.03 265);
-  --foreground: oklch(0.94 0.01 260);
-  --surface: oklch(0.25 0.03 265);
-  --card: oklch(0.25 0.03 265);
-  --card-foreground: oklch(0.94 0.01 260);
-  --popover: oklch(0.25 0.03 265);
-  --popover-foreground: oklch(0.94 0.01 260);
-  --secondary: oklch(0.3 0.03 265);
-  --secondary-foreground: oklch(0.94 0.01 260);
-  --muted: oklch(0.3 0.03 265);
-  --muted-foreground: oklch(0.72 0.02 260);
-  --accent: oklch(0.32 0.04 230);
-  --accent-foreground: oklch(0.94 0.01 260);
-  --border: oklch(0.34 0.03 265);
-  --input: oklch(0.38 0.03 265);
+  /* Slate/Charcoal dark surfaces. Previous navy values (to revert):
+     background 0.2 0.03 265, surface/card/popover 0.25 0.03 265, secondary/muted 0.3 0.03 265,
+     muted-fg 0.72 0.02 260, accent 0.32 0.04 230, border 0.34 0.03 265, input 0.38 0.03 265 */
+  --background: oklch(0.165 0.012 255);
+  --foreground: oklch(0.96 0.005 255);
+  --surface: oklch(0.215 0.014 255);
+  --card: oklch(0.215 0.014 255);
+  --card-foreground: oklch(0.96 0.005 255);
+  --popover: oklch(0.235 0.014 255);
+  --popover-foreground: oklch(0.96 0.005 255);
+  --secondary: oklch(0.28 0.014 255);
+  --secondary-foreground: oklch(0.96 0.005 255);
+  --muted: oklch(0.27 0.012 255);
+  --muted-foreground: oklch(0.76 0.012 255);
+  --accent: oklch(0.3 0.016 255);
+  --accent-foreground: oklch(0.96 0.005 255);
+  --border: oklch(0.32 0.014 255);
+  --input: oklch(0.38 0.014 255);
   --inflow: oklch(0.69 0.08 165);
   --outflow: oklch(0.7 0.13 18);
   --ledger: oklch(0.66 0.1 258);
