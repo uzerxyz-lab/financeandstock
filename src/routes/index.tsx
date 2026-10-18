@@ -293,9 +293,9 @@ function Dashboard() {
   return (
     <div className="space-y-5 pb-10">
       {!stats.d.opening?.completed && (
-        <Link to="/opening" className="card-hover flex flex-wrap items-center justify-between gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm">
+        <Link to="/opening" className="setup-alert card-hover flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm">
           <span><span className="font-semibold">Complete your Opening Setup</span> — enter cash, bank, party, stock and loan balances on your start date.</span>
-          <span className="font-semibold text-primary">Start →</span>
+          <span className="setup-cta font-semibold">Start →</span>
         </Link>
       )}
 

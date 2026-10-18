@@ -412,7 +412,7 @@ function Login({ firstRun: needsSetup, onDone, requireUsername }: { firstRun: bo
           )}
           <Button type="submit" className="login-cta w-full" disabled={busy}>{firstRun ? "Create & Continue" : forgot ? "Reset & Sign in" : "Sign in"}</Button>
           {!needsSetup && (
-            <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full">
+            <Button type="button" variant="link" onClick={() => setForgot((v) => !v)} className="w-full text-login-foreground/75 hover:text-login-foreground">
               {forgot ? "Back to sign in" : "Forgot password?"}
             </Button>
           )}
