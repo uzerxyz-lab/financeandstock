@@ -154,22 +154,30 @@ const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> 
       </div>
     );
   } },
-  quick: { render: (c) => (
-    <div className="flex h-full flex-col">
-      <Head icon={Plus} title="Quick actions" sub={c.h > 1 ? "Common transactions" : undefined} />
-      <div className="mt-3 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => c.openEntry("purchase")} className="rounded-lg bg-primary px-3 py-2 text-[11px] font-semibold text-primary-foreground shadow-sm">+ Purchase</button>
-        <button onClick={() => c.openEntry("sale")} className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Sale</button>
-        <button onClick={() => c.openEntry("inward")} className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Receive</button>
-        <button onClick={() => c.openEntry("outward")} className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Payment</button>
-        {(c.h > 1 || c.w > 1) && <>
-          <button onClick={() => c.openEntry("expense")} className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Expense</button>
-          <Link to="/production" className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Record heat</Link>
-          <button onClick={c.openAccount} className="rounded-lg border bg-card px-3 py-2 text-[11px] font-semibold shadow-sm hover:bg-secondary">+ Account</button>
-        </>}
+  quick: { render: (c) => {
+    const ACT = [
+      { label: "Purchase", icon: ShoppingCart, cls: "bg-purchase-soft text-purchase", go: () => c.openEntry("purchase") },
+      { label: "Sale", icon: BadgeDollarSign, cls: "bg-sale-soft text-sale", go: () => c.openEntry("sale") },
+      { label: "Receive", icon: ArrowDownLeft, cls: "bg-received-soft text-received", go: () => c.openEntry("inward") },
+      { label: "Payment", icon: ArrowUpRight, cls: "bg-paid-soft text-paid", go: () => c.openEntry("outward") },
+      { label: "Expense", icon: Receipt, cls: "bg-expense-card-soft text-expense-card", go: () => c.openEntry("expense") },
+      { label: "Record heat", icon: Flame, cls: "bg-entry-card-soft text-entry-card", go: () => c.openEntry("outward") },
+      { label: "Account", icon: Users, cls: "bg-account-soft text-account", go: c.openAccount },
+    ].filter((_, i) => i < 4 || c.h > 1 || c.w > 1) as { label: string; icon: typeof Wallet; cls: string; go: () => void }[];
+    return (
+      <div className="flex h-full flex-col">
+        <Head title="Quick actions" sub={c.h > 1 ? "Common transactions" : undefined} />
+        <div className={cn("mt-3 grid flex-1 gap-2 [grid-auto-rows:1fr]", c.w > 1 ? "grid-cols-4" : "grid-cols-2")} onClick={(e) => e.stopPropagation()}>
+          {ACT.map((a) => (
+            <button key={a.label} onClick={a.go} className={cn("flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-semibold transition-transform active:scale-95 sm:text-[13px]", a.cls)}>
+              <a.icon className="h-4 w-4 shrink-0" strokeWidth={2.1} />
+              <span className="truncate">{a.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  ) },
+    );
+  } },
   activity: { to: "/entries", render: (c) => (
     <div className="flex h-full flex-col">
       <Head icon={ListOrdered} title="Recent activity" />
