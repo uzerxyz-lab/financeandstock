@@ -17,7 +17,7 @@ function Dialog({ open, onOpenChange, ...props }: React.ComponentProps<typeof Di
     let popped = false;
     window.history.pushState({ ...(window.history.state ?? {}), __modal: true }, "");
     const onPop = () => {
-      if (Date.now() < selfBackUntil) { selfBackUntil = 0; return; }
+      if (Date.now() < selfBackUntil) return;
       popped = true; cb.current?.(false);
     };
     window.addEventListener("popstate", onPop);
