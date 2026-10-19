@@ -28,6 +28,7 @@ export function AccountForm({ initial, onSaved }: { initial?: Account; onSaved?:
     const openingAmount = Math.abs(Number(opening.replace(/,/g, "")) || 0);
     if (type !== "worker" && openingAmount > 0 && !balanceSide) { fieldError("f-balside", "Please select the balance type"); return; }
     const payload = { name: name.trim(), type, title: title.trim(), fixedWages: Number(wages.replace(/,/g, "")) || undefined, idCard: idCard.trim(), phone: phone.trim(), address: address.trim(), openingBalance: balanceSide === "payable" ? -openingAmount : openingAmount };
+    const save = () => {
     if (initial) {
       updateAccount(initial.id, payload);
       toast.success("Account updated");
@@ -38,7 +39,18 @@ export function AccountForm({ initial, onSaved }: { initial?: Account; onSaved?:
       setName(""); setPhone(""); setAddress(""); setOpening(""); setBalanceSide("");
       onSaved?.(a);
     }
+    };
+    const rows: ConfirmRow[] = [
+      ["Account Type", accountTypeLabel(d, type)], ["Name", payload.name],
+      ["Short ID", initial ? initial.code : previewCode(payload.name)],
+      ["Fixed Wages", type === "worker" && payload.fixedWages ? `Rs ${payload.fixedWages.toLocaleString("en-PK")}` : undefined],
+      ["ID Card", type === "worker" ? payload.idCard : undefined],
+      ["Phone", payload.phone], ["Address", payload.address],
+      ["Opening Balance", type !== "worker" && openingAmount ? `Rs ${openingAmount.toLocaleString("en-PK")} · ${balanceSide === "payable" ? "Payable (We Owe Them)" : "Receivable (They Owe Us)"}` : undefined],
+    ];
+    setPending({ rows, save });
   };
+  const [pending, setPending] = useState<{ rows: ConfirmRow[]; save: () => void } | null>(null);
 
   return (
     <form onSubmit={submit} className="space-y-4">
