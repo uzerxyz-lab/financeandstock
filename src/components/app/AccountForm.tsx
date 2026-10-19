@@ -104,6 +104,14 @@ export function AccountForm({ initial, onSaved }: { initial?: Account; onSaved?:
       <div className="flex justify-end">
         <Button type="submit">{initial ? "Update Account" : "Create Account"}</Button>
       </div>
+      <ConfirmSave
+        open={!!pending}
+        title={initial ? "Confirm Account Update" : "Confirm New Account"}
+        rows={pending?.rows ?? []}
+        confirmLabel={initial ? "Confirm & Update" : "Confirm & Create"}
+        onCancel={() => setPending(null)}
+        onConfirm={() => { const p = pending; setPending(null); p?.save(); }}
+      />
     </form>
   );
 }
