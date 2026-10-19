@@ -63,7 +63,8 @@ export interface Entry {
   materialId?: string | undefined;
   weightKg?: number | undefined;
   rate?: number | undefined;
-  payMode?: "credit" | "advance" | undefined;
+  /** "net" = settled sale/purchase: recorded in the ledger but never moves party balance or funds. "advance" is legacy (paired with a linked cash voucher). */
+  payMode?: "credit" | "advance" | "net" | undefined;
   receivedBy?: string | undefined;
   linkedId?: string | undefined;
   createdAt: string;
@@ -541,6 +542,7 @@ export const liveEntries = (d: Data) => d.entries.filter((e) => !e.deletedAt);
 export function signedForAccount(e: Entry) {
   // A bounced cheque never settled anything: the party's original due is restored.
   if (e.chequeStatus === "bounced") return 0;
+  if ((e.type === "sale" || e.type === "purchase") && e.payMode === "net") return 0;
   switch (e.type) {
     case "sale":
     case "outward":

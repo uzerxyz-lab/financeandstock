@@ -35,7 +35,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   const [materialId, setMaterialId] = useState(initial?.materialId ?? "");
   const [weight, setWeight] = useState(initial?.weightKg ? String(initial.weightKg) : "");
   const [rate, setRate] = useState(initial?.rate ? String(initial.rate) : "");
-  const [payMode, setPayMode] = useState<"credit" | "advance" | "">(initial?.payMode ?? "");
+  const [payMode, setPayMode] = useState<"credit" | "advance" | "net" | "">(initial?.payMode ?? "");
   const [receivedBy, setReceivedBy] = useState(initial?.receivedBy ?? "");
 
   const meta = ENTRY_TYPES[type];
@@ -57,7 +57,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   const restoreDraft = () => {
     const dr = draft; if (!dr) return;
     setType(dr["type"] as EntryType); setDate(dr["date"] ?? todayISO()); setAccountId(dr["accountId"]); setAmount(dr["amount"] ?? ""); setParticulars(dr["particulars"] ?? ""); setMethod((dr["method"] as PayMethod) ?? "cash"); setChequeNo(dr["chequeNo"] ?? ""); setBank(dr["bank"] ?? ""); setReference(dr["reference"] ?? ""); setBankId(dr["bankId"] ?? ""); setCategoryId(dr["categoryId"] ?? ""); setFormKey((k) => k + 1);
-    setRemarks(dr["remarks"] ?? ""); setMaterialId(dr["materialId"] ?? ""); setWeight(dr["weight"] ?? ""); setRate(dr["rate"] ?? ""); setPayMode(dr["payMode"] === "advance" ? "advance" : dr["payMode"] === "credit" ? "credit" : ""); setReceivedBy(dr["receivedBy"] ?? "");
+    setRemarks(dr["remarks"] ?? ""); setMaterialId(dr["materialId"] ?? ""); setWeight(dr["weight"] ?? ""); setRate(dr["rate"] ?? ""); setPayMode(dr["payMode"] === "net" || dr["payMode"] === "advance" ? "net" : dr["payMode"] === "credit" ? "credit" : ""); setReceivedBy(dr["receivedBy"] ?? "");
     setDraft(null);
   };
   const discardDraft = () => { localStorage.removeItem(DRAFT); setDraft(null); };
@@ -83,7 +83,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   const autoAmt = trade && wKg > 0 && rt > 0;
   const amt = autoAmt ? Math.round(wKg * rt * 100) / 100 : Number(amount.replace(/,/g, ""));
   // Method fields show for cash vouchers, and for sale/purchase only when paid on the spot (advance).
-  const showPay = meta.cash || (trade && payMode === "advance" && !initial);
+  const showPay = meta.cash;
 
   const reset = () => {
     setAccountId(defaultAccountId); setAmount(""); setChequeNo(""); setBank(""); setReference(""); setParticulars(""); setWeight(""); setRate(""); setReceivedBy(""); setPayMode("");
@@ -128,7 +128,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       onSaved?.();
     } else {
       const e = addEntry(payload);
-      if (trade && payMode === "advance") {
+      if (trade && payMode === "advance") { // legacy only; Net Sale/Purchase records no cash voucher
         // Paid on the spot: record the matching cash voucher so ledgers and cash in hand stay correct.
         const p = addEntry({
           type: type === "sale" ? "inward" : "outward", date, amount: amt, accountId,
@@ -155,7 +155,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       ["Weight / Rate", trade && wKg ? `${fmtTon(wKg)}${rt ? ` @ Rs ${rt}/kg` : ""}` : undefined],
       ["Amount", `Rs ${amt.toLocaleString("en-PK")}`],
       ["In words", amountInWords(amt)],
-      ["Sale Type", trade && payMode ? (payMode === "advance" ? "Paid now" : "Credit") : undefined],
+      ["Sale Type", trade && payMode ? (payMode === "credit" ? "Credit" : "Net (balance unchanged)") : undefined],
       ["Method", showPay ? `${METHODS[method] ?? method}${method !== "cash" && bankName ? ` · ${bankName}` : ""}` : undefined],
       ["Particulars", payload.particulars], ["Remarks", payload.remarks],
     ];
@@ -268,10 +268,10 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
         </Field>
         {trade && !initial && (
           <Field id="f-saletype" label={type === "purchase" ? "Purchase Type *" : "Sale Type *"}>
-            <NativeSelect value={payMode} onChange={(e) => setPayMode(e.target.value as "credit" | "advance")}>
+            <NativeSelect value={payMode} onChange={(e) => setPayMode(e.target.value as "credit" | "net")}>
               <option value="" disabled>Select {type === "purchase" ? "purchase" : "sale"} type…</option>
               <option value="credit">{type === "purchase" ? "Credit Purchase (payable)" : "Credit Sale (receivable)"}</option>
-              <option value="advance">{type === "purchase" ? "Paid Now" : "Received Now"}</option>
+              <option value="net">{type === "purchase" ? "Net Purchase (balance unchanged)" : "Net Sale (balance unchanged)"}</option>
             </NativeSelect>
           </Field>
         )}
