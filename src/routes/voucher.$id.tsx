@@ -69,12 +69,22 @@ function VoucherPage() {
         <Row label={meta.flow === "in" ? "Received From" : meta.flow === "out" ? "Paid To" : "Account"} value={a ? `${a.name} (${a.code})` : undefined} />
         <Row label="Category" value={d.categories.find((c) => c.id === e.categoryId)?.name} />
         <Row label="Particulars" value={e.particulars} />
-        <Row label={e.type === "purchase" ? "Purchase Type" : "Sale Type"} value={e.type === "sale" || e.type === "purchase" ? e.payMode === "advance" ? (e.type === "purchase" ? "Paid Now" : "Received Now") : (e.type === "purchase" ? "Credit Purchase" : "Credit Sale") : undefined} />
+        <Row label={e.type === "purchase" ? "Purchase Type" : "Sale Type"} value={e.type === "sale" || e.type === "purchase" ? e.payMode === "advance" || e.payMode === "net" ? (e.type === "purchase" ? "Net Purchase" : "Net Sale") : (e.type === "purchase" ? "Credit Purchase" : "Credit Sale") : undefined} />
         <Row label="Remarks" value={e.remarks} />
         <Row label="Payment Method" value={e.method ? METHODS[e.method] : undefined} />
         <Row label={e.type === "transfer" ? "Transfer" : "Bank"} value={bankDetails || undefined} />
         <Row label="Cheque Status" value={e.method === "cheque" ? (e.chequeStatus ?? "pending").toUpperCase() : undefined} />
-        <Row label="Previous Balance" value={a ? `${fmtPKR(Math.abs(previousBalance))} · ${balanceClass(a, previousBalance)}${previousBalance > 0 ? " (Dr)" : previousBalance < 0 ? " (Cr)" : ""}` : undefined} />
+        {a && (() => {
+          const eff = signedForAccount(e);
+          const cur = previousBalance + eff;
+          const bt = (b: number) => `${fmtPKR(Math.abs(b))} · ${balanceClass(a, b)}${b > 0 ? " (Dr)" : b < 0 ? " (Cr)" : ""}`;
+          const effText = e.deletedAt ? "Deleted — no effect" : eff === 0 ? "No change to balance" : `${eff > 0 ? "+" : "−"} ${fmtPKR(Math.abs(eff))}`;
+          return <>
+            <Row label="Previous Balance" value={bt(previousBalance)} />
+            <Row label="This Voucher" value={effText} />
+            <div className="grid grid-cols-3 border-b py-2 text-sm font-semibold"><span>Current Balance</span><span className="col-span-2">{bt(e.deletedAt ? previousBalance : cur)}</span></div>
+          </>;
+        })()}
         <div className="mt-6 rounded-md bg-surface p-4">
           <div className="flex items-baseline justify-between">
             <span className="text-sm uppercase tracking-wide text-muted-foreground">Amount</span>
@@ -82,7 +92,7 @@ function VoucherPage() {
           </div>
           <div className="mt-1 text-right text-sm italic">{amountInWords(e.amount)}</div>
         </div>
-        <div data-share-hide className="mt-20 grid grid-cols-3 gap-6 text-center text-xs">
+        <div data-share-hide className="print-sign mt-20 grid grid-cols-3 gap-6 text-center text-xs">
           <span className="border-t pt-1">Prepared By</span>
           <span className="border-t pt-1">Received By</span>
           <span className="border-t pt-1">Authorized Signature</span>

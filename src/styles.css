@@ -353,6 +353,7 @@
 }
 
 .print-only { display: none; }
+.print-sign { display: none !important; }
 @media print {
   @page { size: A4; margin: 10mm; }
   :root, .dark {
@@ -365,6 +366,7 @@
   }
   .no-print { display: none !important; }
   .print-only { display: block !important; }
+  .print-sign { display: grid !important; }
   body { background: white !important; }
   .print-area { box-shadow: none !important; border: none !important; }
    .statement-print, .statement-print *, .print-area, .print-area * { color: black !important; background: transparent !important; box-shadow: none !important; }

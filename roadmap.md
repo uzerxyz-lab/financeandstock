@@ -25,3 +25,4 @@
 - [x] Voucher share as image with thank-you footer; opening balance type rule; required Sale Type; field error highlight + vibration
 - [x] Voucher Previous Balance moved below the Bank line
 - [x] Earlier agreed UI package: 23 alphabetical banks in dropdowns, app-styled dropdowns (no browser selects), sidebar in 6 groups (Overview … System & Administration), compact two-column forms in dim-background pop-ups
+- [x] Net Sale/Net Purchase (ledger record, no balance or cash effect), voucher Previous/This/Current balance, print-only signatures
