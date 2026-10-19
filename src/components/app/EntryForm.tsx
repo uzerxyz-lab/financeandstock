@@ -12,6 +12,7 @@ import {
 } from "@/lib/db";
 import { todayISO, amountInWords, fmtTon } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { ConfirmSave, type ConfirmRow } from "./ConfirmSave";
 
 const DRAFT = "cashbook-entry-draft";
 const TYPE_ORDER: EntryType[] = ["inward", "outward", "sale", "purchase", "salary", "advance", "expense"];
@@ -340,6 +341,10 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
           {initial ? "Update Entry" : `Save ${meta.label}`}
         </Button>
       </div>
+      <ConfirmSave open={!!pending} title={initial ? `Update Voucher V-${initial.voucherNo}?` : `Save ${meta.label}?`} rows={pending?.rows ?? []}
+        confirmLabel={initial ? "Confirm & Update" : "Confirm & Save"}
+        onCancel={() => setPending(null)}
+        onConfirm={() => { const p = pending; setPending(null); p?.save(); }} />
     </form>
   );
 }
