@@ -7,6 +7,8 @@ import { ArrowLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Phone/browser Back closes an open dialog instead of leaving the app.
+// A dialog closing itself calls history.back(); the resulting popstate must not close parent dialogs.
+let selfBackUntil = 0;
 function Dialog({ open, onOpenChange, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   const cb = React.useRef(onOpenChange);
   cb.current = onOpenChange;
@@ -14,11 +16,14 @@ function Dialog({ open, onOpenChange, ...props }: React.ComponentProps<typeof Di
     if (!open || typeof window === "undefined") return;
     let popped = false;
     window.history.pushState({ ...(window.history.state ?? {}), __modal: true }, "");
-    const onPop = () => { popped = true; cb.current?.(false); };
+    const onPop = () => {
+      if (Date.now() < selfBackUntil) { selfBackUntil = 0; return; }
+      popped = true; cb.current?.(false);
+    };
     window.addEventListener("popstate", onPop);
     return () => {
       window.removeEventListener("popstate", onPop);
-      if (!popped && window.history.state?.__modal) window.history.back();
+      if (!popped && window.history.state?.__modal) { selfBackUntil = Date.now() + 400; window.history.back(); }
     };
   }, [open]);
   return <DialogPrimitive.Root {...props} {...(open !== undefined ? { open } : {})} {...(onOpenChange ? { onOpenChange } : {})} />;
