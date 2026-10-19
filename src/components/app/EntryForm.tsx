@@ -120,6 +120,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
     } as const;
     const dup = findDuplicate(getData(), payload, initial?.id);
     if (dup && !confirm(`A similar entry (V-${dup.voucherNo}) already exists for the same account, amount and date. Save anyway?`)) return;
+    const save = () => {
     if (initial) {
       updateEntry(initial.id, payload);
       toast.success(`Voucher V-${initial.voucherNo} updated`);
@@ -145,7 +146,21 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       localStorage.removeItem(DRAFT);
       onSaved?.(e);
     }
+    };
+    const acc = d.accounts.find((a) => a.id === accountId)?.name;
+    const rows: ConfirmRow[] = [
+      ["Type", meta.label], ["Date", date], ["Account", acc],
+      ["Material", trade ? matName : undefined],
+      ["Weight / Rate", trade && wKg ? `${fmtTon(wKg)}${rt ? ` @ Rs ${rt}/kg` : ""}` : undefined],
+      ["Amount", `Rs ${amt.toLocaleString("en-PK")}`],
+      ["In words", amountInWords(amt)],
+      ["Sale Type", trade && payMode ? (payMode === "advance" ? "Paid now" : "Credit") : undefined],
+      ["Method", showPay ? `${METHODS[method] ?? method}${method !== "cash" && bankName ? ` · ${bankName}` : ""}` : undefined],
+      ["Particulars", payload.particulars], ["Remarks", payload.remarks],
+    ];
+    setPending({ rows, save });
   };
+  const [pending, setPending] = useState<{ rows: ConfirmRow[]; save: () => void } | null>(null);
 
   const cap = (s: string) => s.trim().replace(/(^|\s)(\p{L})/gu, (_m, a, b) => a + b.toUpperCase());
   const addCat = async () => {
