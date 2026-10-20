@@ -83,7 +83,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
   const autoAmt = trade && wKg > 0 && rt > 0;
   const amt = autoAmt ? Math.round(wKg * rt * 100) / 100 : Number(amount.replace(/,/g, ""));
   // Method fields show for cash vouchers, and for sale/purchase only when paid on the spot (advance).
-  const showPay = meta.cash;
+  const showPay = meta.cash || (trade && payMode === "net");
 
   const reset = () => {
     setAccountId(defaultAccountId); setAmount(""); setChequeNo(""); setBank(""); setReference(""); setParticulars(""); setWeight(""); setRate(""); setReceivedBy(""); setPayMode("");
@@ -106,11 +106,11 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       type, date, amount: amt, particulars: trade ? tradeText || ENTRY_TYPES[type].label : particulars.trim() || (type === "expense" ? d.categories.find((c) => c.id === categoryId)?.name ?? "Expense" : ENTRY_TYPES[type].label),
       remarks: trade ? remarks.trim() || undefined : undefined,
       accountId: meta.party || type === "expense" ? accountId : undefined,
-      method: meta.cash ? method : undefined,
-      chequeNo: meta.cash && method === "cheque" ? chequeNo : undefined,
+      method: showPay ? method : undefined,
+      chequeNo: showPay && method === "cheque" ? chequeNo : undefined,
       bank: meta.cash && method !== "cash" ? bankName : undefined,
-      ...(type === "transfer" ? {} : { bankId: meta.cash && method !== "cash" ? bankId : undefined }),
-      reference: meta.cash && method === "online" ? reference : undefined,
+      ...(type === "transfer" ? {} : { bankId: showPay && method !== "cash" ? bankId : undefined }),
+      reference: showPay && method === "online" ? reference : undefined,
       chequeStatus: meta.cash && method === "cheque" ? initial?.chequeStatus ?? "pending" : undefined,
       categoryId: type === "expense" ? categoryId : undefined,
       materialId: trade ? materialId : undefined,
@@ -155,7 +155,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       ["Weight / Rate", trade && wKg ? `${fmtTon(wKg)}${rt ? ` @ Rs ${rt}/kg` : ""}` : undefined],
       ["Amount", `Rs ${amt.toLocaleString("en-PK")}`],
       ["In words", amountInWords(amt)],
-      ["Sale Type", trade && payMode ? (payMode === "credit" ? "Credit" : "Net (balance unchanged)") : undefined],
+      [type === "purchase" ? "Purchase Type" : "Sale Type", trade && payMode ? `${payMode === "credit" ? "Credit" : "Net"} ${type === "purchase" ? "Purchase" : "Sale"}${payMode === "credit" ? "" : " (balance unchanged)"}` : undefined],
       ["Method", showPay ? `${METHODS[method] ?? method}${method !== "cash" && bankName ? ` · ${bankName}` : ""}` : undefined],
       ["Particulars", payload.particulars], ["Remarks", payload.remarks],
     ];
