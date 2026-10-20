@@ -190,12 +190,16 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
             className={cn(
               "rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
               type === t
-                ? ENTRY_TYPES[t].flow === "in"
+                ? t === "sale" ? "border-sale bg-sale text-sale-foreground"
+                  : t === "purchase" ? "border-purchase bg-purchase text-purchase-foreground"
+                  : ENTRY_TYPES[t].flow === "in"
                   ? "border-success bg-success text-success-foreground"
                   : ENTRY_TYPES[t].flow === "out"
                     ? "border-destructive bg-destructive text-destructive-foreground"
                     : "border-primary bg-primary text-primary-foreground"
-                : "bg-card text-muted-foreground hover:bg-secondary",
+                : t === "sale" ? "border-sale/40 bg-sale-soft text-sale hover:bg-sale-soft/70"
+                  : t === "purchase" ? "border-purchase/40 bg-purchase-soft text-purchase hover:bg-purchase-soft/70"
+                  : "bg-card text-muted-foreground hover:bg-secondary",
             )}
           >
             {ENTRY_TYPES[t].label}
@@ -337,7 +341,7 @@ export function EntryForm({ initial, onSaved, defaultType = "inward", defaultAcc
       <div className="flex items-center justify-end gap-2 pt-1">
         <span className="mr-auto text-xs text-muted-foreground">Press <kbd className="rounded border bg-secondary px-1">Ctrl</kbd>+<kbd className="rounded border bg-secondary px-1">S</kbd> to save</span>
         {!initial && <Button type="button" variant="ghost" onClick={reset}>Clear</Button>}
-        <Button type="submit" variant={meta.flow === "in" ? "success" : meta.flow === "out" ? "destructive" : "default"}>
+        <Button type="submit" variant={type === "sale" ? "sale" : type === "purchase" ? "purchase" : meta.flow === "in" ? "success" : meta.flow === "out" ? "destructive" : "default"}>
           {initial ? "Update Entry" : `Save ${meta.label}`}
         </Button>
       </div>

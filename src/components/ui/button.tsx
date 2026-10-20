@@ -17,6 +17,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         success: "bg-success text-success-foreground shadow-sm hover:bg-success/90",
+        sale: "bg-sale text-sale-foreground shadow-sm hover:bg-sale/90",
+        purchase: "bg-purchase text-purchase-foreground shadow-sm hover:bg-purchase/90",
       },
       size: {
         default: "h-9 px-4 py-2",
