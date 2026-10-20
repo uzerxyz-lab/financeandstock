@@ -57,7 +57,7 @@ function AccountsPage() {
             <div className="min-w-0">
               <div className="truncate text-base font-semibold sm:text-lg">{a.name}</div>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className={cn("rounded px-2 py-0.5 font-semibold uppercase", a.type === "buyer" ? "bg-account-soft text-account" : a.type === "supplier" ? "bg-purchase-soft text-purchase" : a.type === "worker" ? "bg-report-card-soft text-report-card" : "bg-sale-soft text-sale")}>{accountTypeLabel(d, a.type)}</span>
+                <span className={cn("rounded px-2 py-0.5 font-semibold uppercase", a.type === "buyer" ? "bg-sale-soft text-sale" : a.type === "supplier" ? "bg-purchase-soft text-purchase" : a.type === "worker" ? "bg-report-card-soft text-report-card" : "bg-account-soft text-account")}>{accountTypeLabel(d, a.type)}</span>
                 <span className="num">{a.code}</span>{a.phone && <span>· {a.phone}</span>}
               </div>
             </div>

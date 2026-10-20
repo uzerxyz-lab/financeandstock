@@ -79,8 +79,10 @@
   --color-paid: var(--paid);
   --color-paid-soft: var(--paid-soft);
   --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
   --color-sale-soft: var(--sale-soft);
   --color-purchase: var(--purchase);
+  --color-purchase-foreground: var(--purchase-foreground);
   --color-purchase-soft: var(--purchase-soft);
   --color-account: var(--account);
   --color-account-soft: var(--account-soft);
@@ -194,10 +196,13 @@
   --received-soft: oklch(0.96 0.025 245);
   --paid: oklch(0.59 0.17 18);
   --paid-soft: oklch(0.96 0.035 18);
-  --sale: oklch(0.55 0.11 165);
-  --sale-soft: oklch(0.96 0.03 165);
-  --purchase: oklch(0.61 0.13 78);
-  --purchase-soft: oklch(0.97 0.04 88);
+  /* Sale = steel blue #036989 (light) / #5999AF (dark); Purchase = amber #DB9941 */
+  --sale: oklch(0.487 0.094 228);
+  --sale-foreground: oklch(0.99 0 0);
+  --sale-soft: oklch(0.95 0.025 228);
+  --purchase: oklch(0.64 0.13 68);
+  --purchase-foreground: oklch(0.99 0 0);
+  --purchase-soft: oklch(0.96 0.04 75);
   --account: oklch(0.5 0.15 278);
   --account-soft: oklch(0.96 0.025 278);
   --ledger-card: oklch(0.47 0.045 255);
@@ -240,10 +245,12 @@
   --received-soft: oklch(0.27 0.045 245);
   --paid: oklch(0.72 0.14 18);
   --paid-soft: oklch(0.27 0.05 18);
-  --sale: oklch(0.7 0.1 165);
-  --sale-soft: oklch(0.27 0.04 165);
-  --purchase: oklch(0.75 0.12 78);
-  --purchase-soft: oklch(0.28 0.05 78);
+  --sale: oklch(0.648 0.073 222);
+  --sale-foreground: oklch(0.99 0 0);
+  --sale-soft: oklch(0.27 0.035 225);
+  --purchase: oklch(0.732 0.129 70.8);
+  --purchase-foreground: oklch(0.2 0.02 60);
+  --purchase-soft: oklch(0.28 0.05 70);
   --account: oklch(0.7 0.13 278);
   --account-soft: oklch(0.28 0.05 278);
   --ledger-card: oklch(0.7 0.045 255);
