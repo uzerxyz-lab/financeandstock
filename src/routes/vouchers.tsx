@@ -46,7 +46,7 @@ function Vouchers() {
       <PageHeader title="Vouchers" subtitle={`${list.length} vouchers`} />
       <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
         {FILTERS.map((x) => {
-          const tone = PILL_TONES[x.key];
+          const tone = PILL_TONES[x.key] ?? { on: "", off: "" };
           const on = f === x.key;
           return <Button key={x.key} size="sm" variant="outline" className={cn("shrink-0 rounded-full border-2 font-semibold", on ? tone.on : tone.off)} onClick={() => setF(x.key)}>{x.label}</Button>;
         })}
