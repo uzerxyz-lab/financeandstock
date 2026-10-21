@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { EntryForm } from "@/components/app/EntryForm";
 import { TreasuryCard } from "@/components/app/TreasuryCard";
+import { QuickActions } from "@/components/app/QuickActions";
 import { AccountForm } from "@/components/app/AccountForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -154,39 +155,14 @@ const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> 
       </div>
     );
   } },
-  quick: { render: (c) => {
-    const btnCls = "flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-semibold transition-transform active:scale-95 sm:text-[13px]";
-    const ACT = [
-      { label: "Purchase", icon: ShoppingCart, cls: "bg-purchase-soft text-purchase", go: () => c.openEntry("purchase") },
-      { label: "Sale", icon: BadgeDollarSign, cls: "bg-sale-soft text-sale", go: () => c.openEntry("sale") },
-      { label: "Receive", icon: ArrowDownLeft, cls: "bg-received-soft text-received", go: () => c.openEntry("inward") },
-      { label: "Payment", icon: ArrowUpRight, cls: "bg-paid-soft text-paid", go: () => c.openEntry("outward") },
-      { label: "Expense", icon: Receipt, cls: "bg-expense-card-soft text-expense-card", go: () => c.openEntry("expense") },
-    ] as const;
-    return (
-      <div className="flex h-full flex-col">
-        <Head title="Quick actions" sub={c.h > 1 ? "Common transactions" : undefined} />
-        <div className={cn("mt-3 grid flex-1 gap-2 [grid-auto-rows:1fr]", c.w > 1 ? "grid-cols-4" : "grid-cols-2")} onClick={(e) => e.stopPropagation()}>
-          {ACT.map((a) => (
-            <button key={a.label} onClick={a.go} className={cn(btnCls, a.cls)}>
-              <a.icon className="h-4 w-4 shrink-0" strokeWidth={2.1} />
-              <span className="truncate">{a.label}</span>
-            </button>
-          ))}
-          {(c.h > 1 || c.w > 1) && <>
-            <Link to="/production" title="Record heat" className={cn(btnCls, "bg-entry-card-soft text-entry-card")}>
-              <Flame className="h-4 w-4 shrink-0" strokeWidth={2.1} />
-              <span className="truncate">Heat</span>
-            </Link>
-            <button onClick={c.openAccount} className={cn(btnCls, "bg-account-soft text-account")}>
-              <Users className="h-4 w-4 shrink-0" strokeWidth={2.1} />
-              <span className="truncate">Account</span>
-            </button>
-          </>}
-        </div>
+  quick: { render: (c) => (
+    <div className="flex h-full flex-col">
+      <Head title="Quick actions" sub={c.h > 1 ? "Drag to add or remove" : undefined} />
+      <div className="mt-3 flex min-h-0 flex-1 flex-col">
+        <QuickActions wide={c.w > 1} openEntry={c.openEntry} openAccount={c.openAccount} />
       </div>
-    );
-  } },
+    </div>
+  ) },
   activity: { to: "/entries", render: (c) => (
     <div className="flex h-full flex-col">
       <Head icon={ListOrdered} title="Recent activity" />
