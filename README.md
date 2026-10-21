@@ -4,7 +4,6 @@ Email: uzer.xyz@gmail.com
 
 Contact: +92-333-3334486
 
-This project was built with [Lovable](https://lovable.dev).
 
 **Live app**: https://nexum-tech.lovable.app
 
