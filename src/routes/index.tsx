@@ -157,10 +157,7 @@ const WIDGETS: Record<WidgetId, { to?: string; render: (c: Ctx) => ReactNode }> 
   } },
   quick: { render: (c) => (
     <div className="flex h-full flex-col">
-      <Head title="Quick actions" sub={c.h > 1 ? "Drag to add or remove" : undefined} />
-      <div className="mt-3 flex min-h-0 flex-1 flex-col">
-        <QuickActions wide={c.w > 1} openEntry={c.openEntry} openAccount={c.openAccount} />
-      </div>
+      <QuickActions wide={c.w > 1} openEntry={c.openEntry} openAccount={c.openAccount} header={<Head title="Quick actions" />} />
     </div>
   ) },
   activity: { to: "/entries", render: (c) => (

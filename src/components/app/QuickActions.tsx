@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowDownLeft, ArrowUpRight, BadgeDollarSign, Flame, Receipt, ShoppingCart, Users, type LucideIcon } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, BadgeDollarSign, Flame, Plus, Receipt, ShoppingCart, Users, type LucideIcon } from "lucide-react";
 import type { EntryType } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ function load(): QuickId[] {
   return DEFAULT_QUICK;
 }
 
-export function QuickActions({ wide, openEntry, openAccount }: { wide: boolean; openEntry: (t: EntryType) => void; openAccount: () => void }) {
+export function QuickActions({ wide, openEntry, openAccount, header }: { wide: boolean; openEntry: (t: EntryType) => void; openAccount: () => void; header?: React.ReactNode }) {
   const navigate = useNavigate();
   const [list, setList] = useState<QuickId[]>(DEFAULT_QUICK);
   const [drag, setDrag] = useState<{ id: QuickId; x: number; y: number } | null>(null);
@@ -77,38 +77,49 @@ export function QuickActions({ wide, openEntry, openAccount }: { wide: boolean; 
   };
 
   const extras = ALL.filter((x) => !list.includes(x));
+  const [menu, setMenu] = useState(false);
+  void wide;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2" onClick={(e) => e.stopPropagation()}>
-      <div data-qzone="in" className={cn("grid flex-1 gap-2 [grid-auto-rows:1fr] rounded-lg", wide ? "grid-cols-4" : "grid-cols-2", drag && "outline-dashed outline-1 outline-border")}>
+    <div data-qzone="out" className="flex min-h-0 flex-1 flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="relative flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">{header}</div>
+        <button type="button" aria-label="Add quick action" onClick={() => setMenu((v) => !v)} disabled={extras.length === 0}
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border bg-card text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
+          <Plus className="h-4 w-4" />
+        </button>
+        {menu && extras.length > 0 && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setMenu(false)} />
+            <div className="absolute right-0 top-8 z-50 w-48 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg">
+              {extras.map((id) => {
+                const m = META[id];
+                return (
+                  <button key={id} type="button" onClick={() => { save([...list, id]); setMenu(false); }}
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm hover:bg-secondary">
+                    <m.icon className={cn("h-4 w-4", m.text)} />{m.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+      <div data-qzone="in" className={cn("mt-3 grid flex-1 grid-cols-2 gap-2 [grid-auto-rows:minmax(4.25rem,1fr)] rounded-lg", drag && "outline-dashed outline-1 outline-border")}>
         {list.map((id) => {
           const m = META[id];
           return (
             <button key={id} data-qid={id} onPointerDown={(e) => onDown(e, id)} onClick={() => run(id)}
-              className={cn("relative flex min-w-0 touch-none select-none flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border bg-card px-2 pb-3 pt-2 text-xs font-semibold text-foreground transition-transform active:scale-95 sm:text-[13px]", drag?.id === id && "opacity-40")}>
-              <m.icon className={cn("h-5 w-5 shrink-0", m.text)} strokeWidth={2.1} />
+              className={cn("relative flex min-w-0 touch-none select-none flex-col items-center justify-center gap-1.5 overflow-hidden rounded-lg border bg-card px-2 pb-3.5 pt-2.5 text-sm font-semibold text-foreground transition-transform active:scale-95", drag?.id === id && "opacity-40")}>
+              <m.icon className={cn("h-6 w-6 shrink-0", m.text)} strokeWidth={2.1} />
               <span className="truncate">{m.label}</span>
-              <span className={cn("absolute inset-x-3 bottom-1.5 h-[3px] rounded-full", m.line)} />
+              <span className={cn("absolute inset-x-4 bottom-1.5 h-[3px] rounded-full", m.line)} />
             </button>
           );
         })}
-        {list.length === 0 && <p className="col-span-full self-center text-center text-[11px] text-muted-foreground">Drag actions here</p>}
+        {list.length === 0 && <p className="col-span-full self-center text-center text-[11px] text-muted-foreground">Tap + to add actions</p>}
       </div>
-      {extras.length > 0 && (
-        <div data-qzone="out" className={cn("flex flex-wrap items-center gap-1.5 rounded-lg border border-dashed px-2 py-1.5", drag && "bg-secondary")}>
-          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">More</span>
-          {extras.map((id) => {
-            const m = META[id];
-            return (
-              <button key={id} onPointerDown={(e) => onDown(e, id)} onClick={() => run(id)}
-                className={cn("flex touch-none select-none items-center gap-1 rounded-md bg-secondary px-2 py-1 text-[11px] font-medium", drag?.id === id && "opacity-40")}>
-                <m.icon className={cn("h-3.5 w-3.5", m.text)} />{m.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-      {extras.length === 0 && drag && <div data-qzone="out" className="rounded-lg border border-dashed py-2 text-center text-[11px] text-muted-foreground">Drop here to remove</div>}
+      {drag && <p className="mt-1 text-center text-[10px] text-muted-foreground">Drop outside the buttons to remove</p>}
       {drag && (
         <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-md border bg-card px-2 py-1 text-xs font-semibold shadow-lg" style={{ left: drag.x, top: drag.y }}>
           {META[drag.id].label}
